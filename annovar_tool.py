@@ -30,7 +30,7 @@ if args.annotateVCF:
         destination_path = args.DestinationPath
 else:
     if args.DBPath or args.DestinationPath:
-      parser.error("Le opzioni -DBPath/-db e -DestinationPath/-d sono obbligatorie con --annotateVCF.")
+        parser.error("Le opzioni -DBPath/-db e -DestinationPath/-d sono obbligatorie con --annotateVCF.")
 
 # if exists all three paths
 if os.path.exists(path) and os.path.exists(db_path) and os.path.exists(destination_path):

@@ -4,9 +4,9 @@ import yaml
 from datetime import datetime
 
 def load_config(config_path="config.yaml"):
-  with open(config_path, "r") as file:
-      config = yaml.safe_load(file)
-  return config
+    with open(config_path, "r") as file:
+        config = yaml.safe_load(file)
+    return config
 
 # Carica le configurazioni predefinite dal file YAML
 config = load_config()
@@ -21,7 +21,6 @@ annotateVCF_group.add_argument("--DBPath", "-db", help="Database path for ANNOVA
 annotateVCF_group.add_argument("--DestinationPath", "-d", help="Destination path for annotated files", metavar="PATH DEST", required=False)
 
 args = parser.parse_args()
-
 
 if args.annotateVCF:
   path = args.annotateVCF

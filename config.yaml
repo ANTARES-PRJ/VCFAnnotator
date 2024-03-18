@@ -1,0 +1,8 @@
+# config.yaml
+
+# defaultPath: humandb/
+db_path: "humandb/" #Change this to take a different path for the databases
+
+# defaultPath: result/
+destination_path: "result/" #Change this to take a different path for the Annotated VCF files
+

@@ -4,11 +4,23 @@ from datetime import datetime
 import yaml
 
 def load_config(config_path="config.yaml"):
+    """
+    Load the configuration from a YAML file.
+
+    Args:
+        config_path (str): Path to the YAML configuration file. Default is "config.yaml".
+
+    Returns:
+        dict: The loaded configuration.
+
+    Raises:
+        FileNotFoundError: If the configuration file is not found.
+        yaml.YAMLError: If there is an error while parsing the YAML file.
+    """
     with open(config_path, "r", encoding="utf-8") as file:
         config = yaml.safe_load(file)
     return config
 
-# Carica le configurazioni predefinite dal file YAML
 conf = load_config()
 db_path = conf["db_path"]
 destination_path = conf["destination_path"]
@@ -16,7 +28,6 @@ destination_path = conf["destination_path"]
 parser = argparse.ArgumentParser(description="Tool per l'annotazione di file VCF")
 annotateVCF_group = parser.add_argument_group('option for --annotateVCF')
 parser.add_argument("--annotateVCF", "-a", help="Annotate VCF file with VEP", action="store", metavar="PATH")
-# Aggiunge -DBPath e -DestinationPath al gruppo di argomenti specifici per --annotateVCF
 annotateVCF_group.add_argument("--DBPath", "-db", help="Database path for ANNOVAR", metavar="PATH DB", required=False)
 annotateVCF_group.add_argument("--DestinationPath", "-d", help="Destination path for annotated files", metavar="PATH DEST", required=False)
 
@@ -45,7 +56,8 @@ if os.path.exists(path) and os.path.exists(db_path) and os.path.exists(destinati
             else:
                 print(f"Error: {f} is not a .vcf file")
     else:
-        print("Error: Not a valid file or directory")
+        parser.error("Error: Not a valid file or directory")
 else:
-    print("Error: Path not found")
+    parser.error("Path not found")
+    
     

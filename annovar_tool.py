@@ -60,4 +60,3 @@ if os.path.exists(path) and os.path.exists(db_path) and os.path.exists(destinati
 else:
     parser.error("Path not found")
     
-    

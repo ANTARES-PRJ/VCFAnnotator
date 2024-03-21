@@ -4,19 +4,6 @@ from datetime import datetime
 import yaml
 
 def load_config(config_path="config.yaml"):
-    """
-    Load the configuration from a YAML file.
-
-    Args:
-        config_path (str): Path to the YAML configuration file. Default is "config.yaml".
-
-    Returns:
-        dict: The loaded configuration.
-
-    Raises:
-        FileNotFoundError: If the configuration file is not found.
-        yaml.YAMLError: If there is an error while parsing the YAML file.
-    """
     with open(config_path, "r", encoding="utf-8") as file:
         config = yaml.safe_load(file)
     return config

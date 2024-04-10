@@ -14,7 +14,7 @@ destination_path = conf["destination_path"]
 
 parser = argparse.ArgumentParser(description="Tool per l'annotazione di file VCF")
 annotateVCF_group = parser.add_argument_group('option for --annotateVCF')
-parser.add_argument("--annotateVCF", "-a", help="Annotate VCF file with VEP", action="store", metavar="PATH")
+parser.add_argument("--annotateVCF", "-a",help="Annotate VCF file with VEP", action="store", metavar="PATH")
 annotateVCF_group.add_argument("--DBPath", "-db", help="Database path for ANNOVAR", metavar="PATH DB", required=False)
 annotateVCF_group.add_argument("--DestinationPath", "-d", help="Destination path for annotated files", metavar="PATH DEST", required=False)
 
@@ -34,16 +34,45 @@ else:
 if os.path.exists(path) and os.path.exists(db_path) and os.path.exists(destination_path):
     print(f"Processing {path}...")
     if os.path.isfile(path):
-        os.system(f"perl table_annovar.pl {path} {db_path} -buildver hg19 -out {destination_path + os.path.basename(path) + '_' + datetime.now().strftime('%Y-%m-%d_%H_%M_%S')} -remove -protocol refGene,cytoBand,exac03,avsnp147,dbnsfp30a -operation g,r,f,f,f -nastring . -vcfinput -polish")
+        #fileName = destination_path + os.path.basename(path) + '_' + datetime.now().strftime('%Y-%m-%d_%H_%M_%S')
+        # ?txt version
+        if 'databasesTXT' in conf and conf['databasesTXT']:
+            for db in conf['databasesTXT']:
+                os.system(f"perl table_annovar.pl {path} {db_path} -buildver hg38 -out {destination_path + db['id']+'_' + os.path.basename(path) + '_' + datetime.now().strftime('%Y-%m-%d_%H_%M_%S')} -remove -protocol {db['file']} -operation f -nastring . -vcfinput -polish")
+        # ?vcf version
+        if 'databasesVCF' in conf and conf['databasesVCF']:
+            for db in conf['databasesVCF']:
+                os.system(
+                    f"perl table_annovar.pl {path} {db_path} -buildver hg38 -out {destination_path + db['id']+'_' + os.path.basename(path) + '_' + datetime.now().strftime('%Y-%m-%d_%H_%M_%S')} -remove -protocol vcf -vcfdbfile {db['file']} -operation f -nastring . -vcfinput -polish")
+        # ?gff3 version
+        if 'databasesGFF3' in conf and conf['databasesGFF3']:
+            for db in conf['databasesGFF3']:
+                os.system(
+                    f"perl table_annovar.pl {path} {db_path} -buildver hg38 -out {destination_path + db['id']+'_' + os.path.basename(path) + '_' + datetime.now().strftime('%Y-%m-%d_%H_%M_%S')} -remove -gff3dbfile {db['file']} -protocol gff3 -operation r -nastring . -vcfinput -polish")
+
+    # TODO: change filename with unique name for any file like in the previous case
     elif os.path.isdir(path):
         for f in os.listdir(path):
             if f.endswith(".vcf"):
                 full_file_path = os.path.join(path, f)
-                os.system(f"perl table_annovar.pl {full_file_path} {db_path} -buildver hg19 -out {destination_path + os.path.basename(f) + '_' + datetime.now().strftime('%Y-%m-%d_%H_%M_%S')} -remove -protocol refGene,cytoBand,exac03,avsnp147,dbnsfp30a -operation g,r,f,f,f -nastring . -vcfinput -polish")
+                fileName = destination_path + os.path.basename(f) + '_' + datetime.now().strftime('%Y-%m-%d_%H_%M_%S')
+                if 'databasesTXT' in conf and conf['databasesTXT']:
+                    for db in conf['databasesTXT']:
+                        os.system(f"perl table_annovar.pl {full_file_path} {db_path} -buildver hg38 -out {fileName} -remove -protocol {db['file']} -operation f -nastring . -vcfinput -polish")
+                        full_file_path = fileName
+                # ?vcf version
+                if 'databasesVCF' in conf and conf['databasesVCF']:
+                    for db in conf['databasesVCF']:
+                        os.system(f"perl table_annovar.pl {full_file_path} {db_path} -buildver hg38 -out {fileName} -remove -protocol vcf -vcfdbfile {db['file']} -operation f -nastring . -vcfinput -polish")
+                        full_file_path = fileName
+                # ?gff3 version
+                if 'databasesGFF3' in conf and conf['databasesGFF3']:
+                    for db in conf['databasesGFF3']:
+                        os.system(f"perl table_annovar.pl {full_file_path} {db_path} -buildver hg38 -out {fileName} -remove -gff3dbfile {db['file']} -protocol gff3 -operation r -nastring . -vcfinput -polish")
+                        full_file_path = fileName
             else:
                 print(f"Error: {f} is not a .vcf file")
     else:
         parser.error("Error: Not a valid file or directory")
 else:
     parser.error("Path not found")
-    

@@ -18,11 +18,20 @@ cd annovar_tool
 
 ## Configuration
 
-The tool uses a YAML configuration file named `config.yaml` to specify the default paths for the VEP database and the destination folder for the annotated VCF files. You can modify these paths to suit your needs.
+The tool uses a YAML configuration file named `config.yaml` to specify the default paths for the database and the destination folder for the annotated VCF files. You can modify these paths to suit your needs.
+
+In the following section, databases needed for annotation should be inserted into their respective lists (databasesTXT, databasesVCF, databasesGFF3) according to the database format. The Python code will automatically recognize the quantity and extension, and perform annotation autonomously using the provided databases.
+
+There are two fields to fill in for each database: id (to differentiate it from others) and file (the name of the database file). Here's how to specify the value of file for each type:
+
+- **databasesTXT**: Write the file name without extension and the Human genome reference hg38.
+Example: `file = "clinvar"` will refer to hg38_clinvar.txt.
+- **databasesVCF** and **databasesGFF3**: Specify the full file name with the Human genome reference (hg38_, ...) and the extension.
+Example: `file: "hg38_gnomad.vcf"` or `file: "hg38_hgmd.gff3"`.
 
 ## Usage
 
-To annotate a VCF file, simply run the tool with the `--annotateVCF` option and specify the path to the VCF file. You can also specify the database path and destination path using the `--DBPath` and `--DestinationPath` options, respectively.
+To annotate a VCF file, simply run the tool with the `--annotateVCF` (`-a`) option and specify the path to the VCF file. You can also specify the database path and destination path using the `--DBPath` (`-db`) and `--DestinationPath` (`-d`) options, respectively.
 
 Here's an example command:
 

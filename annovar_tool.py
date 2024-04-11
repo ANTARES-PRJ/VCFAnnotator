@@ -38,38 +38,38 @@ if os.path.exists(path) and os.path.exists(db_path) and os.path.exists(destinati
         # ?txt version
         if 'databasesTXT' in conf and conf['databasesTXT']:
             for db in conf['databasesTXT']:
-                os.system(f"perl table_annovar.pl {path} {db_path} -buildver hg38 -out {destination_path + db['id']+'_' + os.path.basename(path) + '_' + datetime.now().strftime('%Y-%m-%d_%H_%M_%S')} -remove -protocol {db['file']} -operation f -nastring . -vcfinput -polish")
+                os.system(f"perl table_annovar.pl {path} {db_path} -buildver hg38 -out {destination_path + db['id']+'_' + os.path.basename(path) + '_' + datetime.now().strftime('%Y-%m-%d_%H_%M_%S')} -remove -protocol {db['file']} -operation {db['operation']} -nastring . -vcfinput -polish")
+                #path = fileName
         # ?vcf version
         if 'databasesVCF' in conf and conf['databasesVCF']:
             for db in conf['databasesVCF']:
-                os.system(
-                    f"perl table_annovar.pl {path} {db_path} -buildver hg38 -out {destination_path + db['id']+'_' + os.path.basename(path) + '_' + datetime.now().strftime('%Y-%m-%d_%H_%M_%S')} -remove -protocol vcf -vcfdbfile {db['file']} -operation f -nastring . -vcfinput -polish")
+                os.system(f"perl table_annovar.pl {path} {db_path} -buildver hg38 -out {destination_path + db['id']+'_' + os.path.basename(path) + '_' + datetime.now().strftime('%Y-%m-%d_%H_%M_%S')} -remove -protocol vcf -vcfdbfile {db['file']} -operation {db['operation']} -nastring . -vcfinput -polish")
+                #path = fileName
         # ?gff3 version
         if 'databasesGFF3' in conf and conf['databasesGFF3']:
             for db in conf['databasesGFF3']:
-                os.system(
-                    f"perl table_annovar.pl {path} {db_path} -buildver hg38 -out {destination_path + db['id']+'_' + os.path.basename(path) + '_' + datetime.now().strftime('%Y-%m-%d_%H_%M_%S')} -remove -gff3dbfile {db['file']} -protocol gff3 -operation r -nastring . -vcfinput -polish")
-
+                os.system(f"perl table_annovar.pl {path} {db_path} -buildver hg38 -out {destination_path + db['id']+'_' + os.path.basename(path) + '_' + datetime.now().strftime('%Y-%m-%d_%H_%M_%S')} -remove -gff3dbfile {db['file']} -protocol gff3 -operation {db['operation']} -nastring . -vcfinput -polish")
+                #path = fileName
     # TODO: change filename with unique name for any file like in the previous case
     elif os.path.isdir(path):
         for f in os.listdir(path):
             if f.endswith(".vcf"):
                 full_file_path = os.path.join(path, f)
-                fileName = destination_path + os.path.basename(f) + '_' + datetime.now().strftime('%Y-%m-%d_%H_%M_%S')
+                #fileName = destination_path + os.path.basename(f) + '_' + datetime.now().strftime('%Y-%m-%d_%H_%M_%S')
                 if 'databasesTXT' in conf and conf['databasesTXT']:
                     for db in conf['databasesTXT']:
-                        os.system(f"perl table_annovar.pl {full_file_path} {db_path} -buildver hg38 -out {fileName} -remove -protocol {db['file']} -operation f -nastring . -vcfinput -polish")
-                        full_file_path = fileName
+                        os.system(f"perl table_annovar.pl {full_file_path} {db_path} -buildver hg38 -out {destination_path + db['id']+'_' + os.path.basename(path) + '_' + datetime.now().strftime('%Y-%m-%d_%H_%M_%S')} -remove -protocol {db['file']} -operation {db['operation']} -nastring . -vcfinput -polish")
+                        #full_file_path = fileName
                 # ?vcf version
                 if 'databasesVCF' in conf and conf['databasesVCF']:
                     for db in conf['databasesVCF']:
-                        os.system(f"perl table_annovar.pl {full_file_path} {db_path} -buildver hg38 -out {fileName} -remove -protocol vcf -vcfdbfile {db['file']} -operation f -nastring . -vcfinput -polish")
-                        full_file_path = fileName
+                        os.system(f"perl table_annovar.pl {full_file_path} {db_path} -buildver hg38 -out {destination_path + db['id']+'_' + os.path.basename(path) + '_' + datetime.now().strftime('%Y-%m-%d_%H_%M_%S')} -remove -protocol vcf -vcfdbfile {db['file']} -operation {db['operation']} -nastring . -vcfinput -polish")
+                        #full_file_path = fileName
                 # ?gff3 version
                 if 'databasesGFF3' in conf and conf['databasesGFF3']:
                     for db in conf['databasesGFF3']:
-                        os.system(f"perl table_annovar.pl {full_file_path} {db_path} -buildver hg38 -out {fileName} -remove -gff3dbfile {db['file']} -protocol gff3 -operation r -nastring . -vcfinput -polish")
-                        full_file_path = fileName
+                        os.system(f"perl table_annovar.pl {full_file_path} {db_path} -buildver hg38 -out {destination_path + db['id']+'_' + os.path.basename(path) + '_' + datetime.now().strftime('%Y-%m-%d_%H_%M_%S')} -remove -gff3dbfile {db['file']} -protocol gff3 -operation {db['operation']} -nastring . -vcfinput -polish")
+                        #full_file_path = fileName
             else:
                 print(f"Error: {f} is not a .vcf file")
     else:

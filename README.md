@@ -31,8 +31,12 @@ The tool uses a YAML configuration file named `config.yaml` to specify the defau
 
 In the following section, databases needed for annotation should be inserted into their respective lists (databasesTXT, databasesVCF, databasesGFF3) according to the database format. The Python code will automatically recognize the quantity and extension, and perform annotation autonomously using the provided databases.
 
-There are two fields to fill in for each database: id (to differentiate it from others) and file (the name of the database file). Here's how to specify the value of file for each type:
+There are two fields to fill in for each database:
+- `id` to differentiate it from others;
+- `file` is the name of the database file;
+- `operation` indicate the type of operation with which you want to use the specific database.
 
+Here's how to specify the value of file for each type:
 - **databasesTXT**: Write the file name without extension and the Human genome reference hg38.
 Example: `file = "clinvar"` will refer to hg38_clinvar.txt.
 - **databasesVCF** and **databasesGFF3**: Specify the full file name with the Human genome reference (hg38_, ...) and the extension.

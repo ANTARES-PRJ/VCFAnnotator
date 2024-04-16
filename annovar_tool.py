@@ -43,11 +43,6 @@ if os.path.exists(path) and os.path.exists(db_path) and os.path.exists(destinati
         # ?vcf version
         if 'databasesVCF' in conf and conf['databasesVCF']:
             for db in conf['databasesVCF']:
-                
-                # o ci pigliamo la colonna dal dropped e la inseriamo nel multiannogenerato
-                # trovare il modo di usare -infoasscore
-                # fare un ibrido di comandi 
-                
                 os.system(f"perl table_annovar.pl {path} {db_path} -buildver hg38 -argument '-infoasscore' -out {destination_path + db['id']+'_' + os.path.basename(path) + '_' + datetime.now().strftime('%Y-%m-%d_%H_%M_%S')} -remove -protocol vcf -vcfdbfile {db['file']} -operation {db['operation']} -nastring . -vcfinput -polish")
                 #path = fileName
         # ?gff3 version
@@ -55,7 +50,6 @@ if os.path.exists(path) and os.path.exists(db_path) and os.path.exists(destinati
             for db in conf['databasesGFF3']:
                 os.system(f"perl table_annovar.pl {path} {db_path} -buildver hg38 -out {destination_path + db['id']+'_' + os.path.basename(path) + '_' + datetime.now().strftime('%Y-%m-%d_%H_%M_%S')} -remove -gff3dbfile {db['file']} -protocol gff3 -operation {db['operation']} -nastring . -vcfinput -polish")
                 #path = fileName
-    # TODO: change filename with unique name for any file like in the previous case
     elif os.path.isdir(path):
         for f in os.listdir(path):
             if f.endswith(".vcf"):

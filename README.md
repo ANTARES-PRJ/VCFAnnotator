@@ -1,11 +1,14 @@
 # Annovar-Tool
 
 We have developed a tool for the Annovar software, which enables batch processing of VCF files for DNA genome annotation, comparing various databases and scientific notations.
+
 Using the following databases: GnomAD, ClinVar, GENCODE, HGMD, OMIM.
+
+Please note that the tool can only annotate VCF files.
 
 Upcoming implementations:
 Checking for more recent versions of the databases used (database links...)
-TO DO
+TO DO ...
 
 
 ## Prerequisites
@@ -45,12 +48,17 @@ Example: `file: "hg38_gnomad.vcf"` or `file: "hg38_hgmd.gff3"`.
 
 ## Usage
 
-To annotate a VCF file, simply run the tool with the `--annotateVCF` (`-a`) option and specify the path to the VCF file. You can also specify the database path and destination path using the `--DBPath` (`-db`) and `--DestinationPath` (`-d`) options, respectively.
+To annotate a VCF file, simply run the tool with the `--annotateVCF` (`-a`) option and specify the path to the VCF file. 
+```
+python annovar_tool.py --annotateVCF /path/to/input.vcf
+```
+
+You can also specify the database path and destination path using the `--DBPath` (`-db`) and `--DestinationPath` (`-d`) options, respectively.
 
 Here's an example command:
 
 ```
-python annovar_tool.py --annotateVCF path/to/input.vcf --DBPath path/to/database --DestinationPath path/to/output_folder
+python annovar_tool.py --annotateVCF /path/to/input.vcf --DBPath /path/to/database --DestinationPath /path/to/output_folder
 ```
 
 If you don't specify the database path and destination path, the tool will use the default paths specified in the `config.yaml` file.

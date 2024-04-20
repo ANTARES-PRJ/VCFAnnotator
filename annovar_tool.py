@@ -62,7 +62,7 @@ if os.path.exists(path) and os.path.exists(db_path) and os.path.exists(destinati
                 # ?vcf version
                 if 'databasesVCF' in conf and conf['databasesVCF']:
                     for db in conf['databasesVCF']:
-                        os.system(f"perl table_annovar.pl {full_file_path} {db_path} -buildver hg38 -out {destination_path + db['id']+'_' + os.path.basename(path) + '_' + datetime.now().strftime('%Y-%m-%d_%H_%M_%S')} -remove -protocol vcf -vcfdbfile {db['file']} -operation {db['operation']} -nastring . -vcfinput -polish")
+                        os.system(f"perl table_annovar.pl {full_file_path} {db_path} -buildver hg38 -argument '-infoasscore' -out {destination_path + db['id']+'_' + os.path.basename(path) + '_' + datetime.now().strftime('%Y-%m-%d_%H_%M_%S')} -remove -protocol vcf -vcfdbfile {db['file']} -operation {db['operation']} -nastring . -vcfinput -polish")
                         #full_file_path = fileName
                 # ?gff3 version
                 if 'databasesGFF3' in conf and conf['databasesGFF3']:

@@ -17,13 +17,26 @@ databasesTXT:
     file: "omim"
     operation: "f"
 databasesVCF:
-  #- id: genomAD
-  #file: "hg38_gnomad.vcf"
-  #operation: "f"
+  - id: genomAD
+    file: "hg38_gnomad.vcf"
+    operation: "f"
   - id: HGMD
-    file: "hg38_hgmd.vcf"
+    file: "hg38_hgmd.vcf" #substitute <del> with the .
     operation: "f"
 databasesGFF3:
   - id: Gencode
     file: "hg38_gencode.gff3"
     operation: "r"
+
+# Scraping
+
+autoCheck: false
+
+scraping:
+  - id: Clinvar
+    release: "44"
+    data: "12.2023"
+    genVersion: "GRCh38"
+  - id: Clinvar
+    name: "clinvar.vcf.gz"
+    data: "2024-04-16"

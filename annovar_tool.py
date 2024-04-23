@@ -1,35 +1,24 @@
 import os
 import argparse
-from datetime import datetime
+from datetime import datetime, date
 import yaml
 import requests 
 from bs4 import BeautifulSoup
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
-
+from packaging import version
+import re
+from tabulate import tabulate
 
 def scrapeGencode(scraping):
-# URL della pagina
     url = 'https://www.gencodegenes.org/human/releases.html'
-
-    # Effettua la richiesta HTTP al sito web
     response = requests.get(url)
-
-    # Assicuriamoci che la richiesta sia andata a buon fine
     if response.status_code == 200:
-        # Utilizza BeautifulSoup per analizzare il contenuto HTML
         soup = BeautifulSoup(response.text, 'html.parser')
-
-        # Trova tutte le righe della tabella che potrebbero contenere le informazioni delle release
         rows = soup.find_all('tr', class_="toggleable")
-        
         for row in rows:
             cells = row.find_all('td', class_="center")
-            # Assicurati che ci siano abbastanza celle per evitare errori
             if len(cells) > 1:
                 link = cells[1].find('a')
-                if link and link.text > scraping[0]['release'] and (datetime.strptime(cells[3].text, "%m.%Y") > datetime.strptime(scraping[0]['data'], "%m.%Y")) and scraping[0]['genVersion'] in cells[4].text:
+                if link and version.parse(link.text) > version.parse(scraping[0]['release']) and (datetime.strptime(cells[3].text, "%m.%Y") > datetime.strptime(scraping[0]['date'], "%m.%Y")) and scraping[0]['genVersion'] in cells[4].text:
                     return True
                 break
         else:
@@ -40,7 +29,6 @@ def scrapeGencode(scraping):
 
 def scrapeClinvar(scraping):
     url = 'https://ftp.ncbi.nlm.nih.gov/pub/clinvar/vcf_GRCh38/'
-    # Effettua la richiesta HTTP al sito web
     response = requests.get(url)
     if response.status_code == 200:
         soup = BeautifulSoup(response.text, 'html.parser')
@@ -50,38 +38,82 @@ def scrapeClinvar(scraping):
                     date = link.next_sibling.strip()
                     if date and " " in date:
                         date = date.split(" ")[0] 
-                        if(datetime.strptime(date, "%Y-%m-%d") > datetime.strptime(scraping[1]['data'], "%Y-%m-%d")):
+                        if(datetime.strptime(date, "%Y-%m-%d") > datetime.strptime(scraping[1]['date'], "%Y-%m-%d")):
                             return True
                         else:
                             return False
     else:
         print("Failed to retrieve content: ", response.status_code)
 
-#TODO: verify if is possible to scrape the page with selenium because must be have a chrome driver installed
 
-def seleniumScrape():
-# Setup del WebDriver
-    service = Service(ChromeDriverManager().install())
-    driver = webdriver.Chrome(service=service)
-
-    # Vai alla pagina web
-    driver.get('https://gnomad.broadinstitute.org/')
-
-    # Aspetta che il JavaScript carichi il contenuto, puoi aumentare il tempo se necessario
-    driver.implicitly_wait(10)  # aspetta 10 secondi
-
-    # Ora puoi usare BeautifulSoup per analizzare la pagina
-    soup = BeautifulSoup(driver.page_source, 'html.parser')
-
-    # Trova gli elementi desiderati, per esempio, estraendo testo o attributi
-    elements = soup.select('select.Select-sc-1lkyg9e-0')
-
-    # Esempio di stampa dei risultati
-    for element in elements:
-        for select in element.find_all('select.Select-sc-1lkyg9e-0'):
-            print(select.text.strip())
-    driver.quit()
-
+def scrapeGnomad(scraping):
+    try:
+        url = 'https://gnomad.broadinstitute.org/news/category/release/'
+        response = requests.get(url)
+        response.raise_for_status()
+        soup = BeautifulSoup(response.text, 'html.parser')
+        last_article_title = soup.select('h2.article-title')[0].get_text().strip()
+        version_number = last_article_title.split("v")[-1]   
+        if(version.parse(version_number) > version.parse(scraping[2]['release'])):
+            return True
+        else:
+            return False    
+    except Exception as e:
+        print("Failed to retrieve GnomAD content", e)
+        return -1
+    
+def scrapeOMIM(scraping):
+    url = 'https://www.omim.org/statistics/update'
+    #baypass anti-bot
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+        'Accept-Language': 'en-US,en;q=0.5',
+        'Referer': 'https://www.omim.org/'
+    }
+    
+    try:
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+        soup = BeautifulSoup(response.text, 'html.parser')
+        year = soup.find('table').find('tr').find_all('td')[0].get_text().strip()
+        month = soup.find('table').find('tr').find_all('td')[-1]
+        if month.find('a'):
+            url = month.find('a')['href'] 
+            month = url.split('/')[-1]
+            remoteDate = date(int(year), int(month), 1)
+            localDate = datetime.strptime(scraping[3]['date'], '%Y-%m-%d').date()
+            if(remoteDate>localDate):
+                return True
+            else:
+                url = f'https://www.omim.org/statistics/updates/{year}/{month}'                
+                response = requests.get(url, headers=headers)
+                response.raise_for_status()
+                soup = BeautifulSoup(response.text, 'html.parser')
+                # Trovare l'elemento h4 e ottenere il testo
+                remoteLastDate = soup.find('h4').get_text().strip()
+                cleanedRemote = re.sub(r'(\d+)(st|nd|rd|th)', r'\1', remoteLastDate)
+                remoteLastDate = datetime.strptime(cleanedRemote, "%B %d, %Y").date()
+                if(remoteLastDate>localDate):
+                    return True
+                else:
+                    return False
+    except requests.exceptions.HTTPError as e:
+        print(f"HTTP Error occurred: {e.response.status_code}")
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+        
+        
+def tabulateUpdates(scraping, gencode, clinvar, gnomad, omim):
+    data = [
+    [scraping[0]['id'], scraping[0]['date'] , scraping[0]['release'] , "[!]" if gencode else " "],
+    [scraping[1]['id'], scraping[1]['date'], "/",  "[!]" if clinvar else " "],
+    [scraping[2]['id'], "/", scraping[2]['release']  ,  "[!]" if gnomad else " "],
+    [scraping[3]['id'], scraping[3]['date'] , "/",  "[!]" if omim else " "]
+    ]
+    headers = ["Database", "Date", "Version", "Update"]
+    print(tabulate(data, headers=headers, tablefmt="fancy_grid"))
+    
     
 def load_config(config_path="config.yaml"):
     with open(config_path, "r", encoding="utf-8") as file:
@@ -117,6 +149,7 @@ else:
         
 # if exists all three paths
 if os.path.exists(path) and os.path.exists(db_path) and os.path.exists(destination_path):
+    #TODO: add update function if autoupdate is enabled
     print(f"Processing {path}...")
     if os.path.isfile(path):
         #fileName = destination_path + os.path.basename(path) + '_' + datetime.now().strftime('%Y-%m-%d_%H_%M_%S')
@@ -159,9 +192,13 @@ if os.path.exists(path) and os.path.exists(db_path) and os.path.exists(destinati
     else:
         parser.error("Error: Not a valid file or directory")
 elif checkDB_group:
-    gencode=scrapeGencode(scraping)
+    gencode = scrapeGencode(scraping)
     clinvar = scrapeClinvar(scraping)   
-    #seleniumScrape()
+    gnomad = scrapeGnomad(scraping)
+    omim = scrapeOMIM(scraping)
+    tabulateUpdates(scraping, gencode, clinvar, gnomad, omim)
     
 else:
     parser.error("Path not found")
+
+

@@ -7,23 +7,37 @@ db_path: "humandb/" #Change this to take a different path for the databases
 destination_path: "result/" #Change this to take a different path for the Annotated VCF files
 
 # nameOfDB
-#TODO: Add doc for the nomencalture of the databases
-
 databasesTXT:
   - id: Clinvar
     file: "convertito"
     operation: "f"
-  - id: OMIM
-    file: "omim"
-    operation: "f"
+  #- id: OMIM
+  #  file: "omim"
+  #  operation: "f"
 databasesVCF:
-  #- id: genomAD
-  #file: "hg38_gnomad.vcf"
-  #operation: "f"
+  - id: genomAD
+    file: "hg38_gnomad.vcf"
+    operation: "f"
   - id: HGMD
-    file: "hg38_hgmd.vcf"
+    file: "hg38_hgmd.vcf" #substitute <del> with the .
     operation: "f"
 databasesGFF3:
   - id: Gencode
     file: "hg38_gencode.gff3"
     operation: "r"
+
+# Scraping
+autoCheck: true
+
+scraping:
+  - id: Gencode
+    release: "44"
+    date: "12.2023"
+    genVersion: "GRCh38"
+  - id: Clinvar
+    name: "clinvar.vcf.gz"
+    date: "2024-04-22"
+  - id: GnomAD
+    release: "4.0"
+  - id: OMIM
+    date: "2024-04-16"

@@ -3,11 +3,46 @@ import argparse
 from datetime import datetime, date
 import yaml
 import requests 
+import shutil
 from bs4 import BeautifulSoup
 from packaging import version
 import re
+import pandas as pd
 from tabulate import tabulate
 
+
+def generateTemp(fileName, fileNameTemp):
+    dest = destination_path + "temp/"
+    if not os.path.exists(dest):
+        os.makedirs(dest)
+    shutil.copy(fileName + ".hg38_multianno.txt", fileNameTemp + ".hg38_multianno.txt")
+    
+    
+def mergeColumns(path):
+    conf['databasesTXT']  
+    dest = destination_path + "temp/"
+    files = sorted([file for file in os.listdir(dest) if file.endswith('.txt')])
+    combined_data = pd.DataFrame()
+    print(enumerate(files))
+    column_name = ''
+    for i, fname in enumerate(files):
+        data = pd.read_csv(dest + fname, sep='\t')
+        if i == 0:
+            combined_data = data
+        for db in conf['databasesTXT']:
+            if db['file'] in data.columns:
+                column_name = db['file']            
+        if not column_name: 
+            column_name = 'vcf' if 'vcf' in data.columns else 'gff3' if 'gff3' in data.columns else ValueError("No column found")
+        combined_data[fname] = data[column_name]
+        if i == 0:
+            combined_data.drop(column_name, axis=1, inplace=True) 
+        column_name = ''
+        nameFile,ext = os.path.splitext(os.path.basename(path))
+    combined_data.to_csv(nameFile+'_result_'+datetime.now().strftime('%Y-%m-%d_%H_%M_%S')+'.txt', sep='\t', index=False)
+    shutil.rmtree(dest)
+    
+    
 def scrapeGencode(scraping):
     url = 'https://www.gencodegenes.org/human/releases.html'
     response = requests.get(url)
@@ -149,44 +184,58 @@ else:
         
 # if exists all three paths
 if os.path.exists(path) and os.path.exists(db_path) and os.path.exists(destination_path):
-    #TODO: add update function if autoupdate is enabled
+    if(conf['autoCheck']):
+        tabulateUpdates(scraping, scrapeGencode(scraping), scrapeClinvar(scraping) , scrapeGnomad(scraping), scrapeOMIM(scraping))
     print(f"Processing {path}...")
     if os.path.isfile(path):
         #fileName = destination_path + os.path.basename(path) + '_' + datetime.now().strftime('%Y-%m-%d_%H_%M_%S')
         # ?txt version
         if 'databasesTXT' in conf and conf['databasesTXT']:
             for db in conf['databasesTXT']:
-                os.system(f"perl table_annovar.pl {path} {db_path} -buildver hg38 -out {destination_path + db['id']+'_' + os.path.basename(path) + '_' + datetime.now().strftime('%Y-%m-%d_%H_%M_%S')} -remove -protocol {db['file']} -operation {db['operation']} -nastring . -vcfinput -polish")
-                #path = fileName
+                fileName = destination_path + db['id']+'_' + os.path.basename(path) + '_' + datetime.now().strftime('%Y-%m-%d_%H_%M_%S')
+                fileNameTemp = destination_path + "temp/" + db['id']
+                os.system(f"perl table_annovar.pl {path} {db_path} -buildver hg38 -out {fileName} -remove -protocol {db['file']} -operation {db['operation']} -nastring . -vcfinput -polish")
+                generateTemp(fileName, fileNameTemp)
         # ?vcf version
         if 'databasesVCF' in conf and conf['databasesVCF']:
             for db in conf['databasesVCF']:
-                os.system(f"perl table_annovar.pl {path} {db_path} -buildver hg38 -argument '-infoasscore' -out {destination_path + db['id']+'_' + os.path.basename(path) + '_' + datetime.now().strftime('%Y-%m-%d_%H_%M_%S')} -remove -protocol vcf -vcfdbfile {db['file']} -operation {db['operation']} -nastring . -vcfinput -polish")
-                #path = fileName
+                fileName = destination_path + db['id']+'_' + os.path.basename(path) + '_' + datetime.now().strftime('%Y-%m-%d_%H_%M_%S')
+                fileNameTemp = destination_path + "temp/" + db['id']
+                os.system(f"perl table_annovar.pl {path} {db_path} -buildver hg38 -argument '-infoasscore' -out {fileName} -remove -protocol vcf -vcfdbfile {db['file']} -operation {db['operation']} -nastring . -vcfinput -polish")
+                generateTemp(fileName, fileNameTemp)
         # ?gff3 version
         if 'databasesGFF3' in conf and conf['databasesGFF3']:
             for db in conf['databasesGFF3']:
-                os.system(f"perl table_annovar.pl {path} {db_path} -buildver hg38 -out {destination_path + db['id']+'_' + os.path.basename(path) + '_' + datetime.now().strftime('%Y-%m-%d_%H_%M_%S')} -remove -gff3dbfile {db['file']} -protocol gff3 -operation {db['operation']} -nastring . -vcfinput -polish")
-                #path = fileName
+                fileName = destination_path + db['id']+'_' + os.path.basename(path) + '_' + datetime.now().strftime('%Y-%m-%d_%H_%M_%S')
+                fileNameTemp = destination_path + "temp/" + db['id']
+                os.system(f"perl table_annovar.pl {path} {db_path} -buildver hg38 -out {fileName} -remove -gff3dbfile {db['file']} -protocol gff3 -operation {db['operation']} -nastring . -vcfinput -polish")
+                generateTemp(fileName, fileNameTemp)
+        mergeColumns(path)
     elif os.path.isdir(path):
         for f in os.listdir(path):
             if f.endswith(".vcf"):
                 full_file_path = os.path.join(path, f)
-                #fileName = destination_path + os.path.basename(f) + '_' + datetime.now().strftime('%Y-%m-%d_%H_%M_%S')
                 if 'databasesTXT' in conf and conf['databasesTXT']:
                     for db in conf['databasesTXT']:
-                        os.system(f"perl table_annovar.pl {full_file_path} {db_path} -buildver hg38 -out {destination_path + db['id']+'_' + os.path.basename(path) + '_' + datetime.now().strftime('%Y-%m-%d_%H_%M_%S')} -remove -protocol {db['file']} -operation {db['operation']} -nastring . -vcfinput -polish")
-                        #full_file_path = fileName
+                        fileName = destination_path + db['id']+'_' + os.path.basename(f) + '_' + datetime.now().strftime('%Y-%m-%d_%H_%M_%S')
+                        fileNameTemp = destination_path + "temp/" + db['id']
+                        os.system(f"perl table_annovar.pl {full_file_path} {db_path} -buildver hg38 -out {fileName}  -remove -protocol {db['file']} -operation {db['operation']} -nastring . -vcfinput -polish")
+                        generateTemp(fileName, fileNameTemp)
                 # ?vcf version
                 if 'databasesVCF' in conf and conf['databasesVCF']:
                     for db in conf['databasesVCF']:
-                        os.system(f"perl table_annovar.pl {full_file_path} {db_path} -buildver hg38 -argument '-infoasscore' -out {destination_path + db['id']+'_' + os.path.basename(path) + '_' + datetime.now().strftime('%Y-%m-%d_%H_%M_%S')} -remove -protocol vcf -vcfdbfile {db['file']} -operation {db['operation']} -nastring . -vcfinput -polish")
-                        #full_file_path = fileName
+                        fileName = destination_path + db['id']+'_' + os.path.basename(f) + '_' + datetime.now().strftime('%Y-%m-%d_%H_%M_%S')
+                        fileNameTemp = destination_path + "temp/" + db['id']
+                        os.system(f"perl table_annovar.pl {full_file_path} {db_path} -buildver hg38 -argument '-infoasscore' -out {fileName} -remove -protocol vcf -vcfdbfile {db['file']} -operation {db['operation']} -nastring . -vcfinput -polish")
+                        generateTemp(fileName, fileNameTemp)
                 # ?gff3 version
                 if 'databasesGFF3' in conf and conf['databasesGFF3']:
                     for db in conf['databasesGFF3']:
-                        os.system(f"perl table_annovar.pl {full_file_path} {db_path} -buildver hg38 -out {destination_path + db['id']+'_' + os.path.basename(path) + '_' + datetime.now().strftime('%Y-%m-%d_%H_%M_%S')} -remove -gff3dbfile {db['file']} -protocol gff3 -operation {db['operation']} -nastring . -vcfinput -polish")
-                        #full_file_path = fileName
+                        fileName = destination_path + db['id']+'_' + os.path.basename(f) + '_' + datetime.now().strftime('%Y-%m-%d_%H_%M_%S')
+                        fileNameTemp = destination_path + "temp/" + db['id']
+                        os.system(f"perl table_annovar.pl {full_file_path} {db_path} -buildver hg38 -out {fileName} -remove -gff3dbfile {db['file']} -protocol gff3 -operation {db['operation']} -nastring . -vcfinput -polish")
+                        generateTemp(fileName, fileNameTemp)
+                mergeColumns(f)
             else:
                 print(f"Error: {f} is not a .vcf file")
     else:

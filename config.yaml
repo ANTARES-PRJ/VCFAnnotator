@@ -11,9 +11,9 @@ databasesTXT:
   - id: Clinvar
     file: "convertito"
     operation: "f"
-  - id: OMIM
-    file: "omim"
-    operation: "f"
+  #- id: OMIM
+  #  file: "omim"
+  #  operation: "f"
 databasesVCF:
   - id: genomAD
     file: "hg38_gnomad.vcf"
@@ -27,9 +27,8 @@ databasesGFF3:
     operation: "r"
 
 # Scraping
-autoCheck: false
+autoCheck: true
 
-#TODO: Do a documentation for the scraping into readme file and comment the following lines
 scraping:
   - id: Gencode
     release: "44"
@@ -39,6 +38,6 @@ scraping:
     name: "clinvar.vcf.gz"
     date: "2024-04-22"
   - id: GnomAD
-    release: "4.1"
+    release: "4.0"
   - id: OMIM
     date: "2024-04-16"

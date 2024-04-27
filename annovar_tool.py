@@ -241,11 +241,7 @@ if os.path.exists(path) and os.path.exists(db_path) and os.path.exists(destinati
     else:
         parser.error("Error: Not a valid file or directory")
 elif checkDB_group:
-    gencode = scrapeGencode(scraping)
-    clinvar = scrapeClinvar(scraping)   
-    gnomad = scrapeGnomad(scraping)
-    omim = scrapeOMIM(scraping)
-    tabulateUpdates(scraping, gencode, clinvar, gnomad, omim)
+    tabulateUpdates(scraping, scrapeGencode(scraping), scrapeClinvar(scraping), scrapeGnomad(scraping), scrapeOMIM(scraping))
     
 else:
     parser.error("Path not found")

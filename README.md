@@ -6,7 +6,7 @@ Using the following databases: GnomAD, ClinVar, GENCODE, HGMD, OMIM.
 
 Please note that the tool can only annotate VCF files.
 
-The results of the annotation of one or more VCF files, for each individual Database, will be available in the 'result/' folder named as follows:
+The results of the annotation of one or more VCF files, for each individual Database, will be available in the `result/` folder named as follows:
 
 *DBName_VCFInputName_YYYY-mm-dd_HH_MM_SS(.avinput/.txt/.vcf)*
 

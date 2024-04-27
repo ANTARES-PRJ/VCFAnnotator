@@ -6,8 +6,24 @@ Using the following databases: GnomAD, ClinVar, GENCODE, HGMD, OMIM.
 
 Please note that the tool can only annotate VCF files.
 
+The results of the annotation of one or more VCF files, for each individual Database, will be available in the 'result/' folder named as follows:
+
+*DBName_VCFInputName_YYYY-mm-dd_HH_MM_SS(.avinput/.txt/.vcf)*
+
+Available in all three output formats of Annovar, namely: avinput, txt, and vcf.
+
+In addition, for each annotation, a unique .txt file is also generated for all the DBs with which you wanted to annotate, and it will be named:
+*VCFInputName_result_YYYY-mm-dd_HH_MM_SS.txt*
+
+It will gather all the annotations into a single file, adding a column for each DB, called as the same, to differentiate the various annotations.
+
+Also, checking for more recent versions of the databases used, performing scraping directly on the download sites of the databases.
+- **Gencode** (https://www.gencodegenes.org/human/)
+- **Clinvar** (https://www.ncbi.nlm.nih.gov/clinvar/)
+- **GnomAD** (https://gnomad.broadinstitute.org/)
+- **OMIM** (https://www.omim.org/downloads)
+
 Upcoming implementations:
-Checking for more recent versions of the databases used (database links...)
 TO DO ...
 
 
@@ -23,7 +39,7 @@ TO DO ...
 To install the tool, simply clone the repository and install the required dependencies:
 
 ```
-git clone https://github.com/YourGithub/annovar_tool.git
+git clone https://github.com/ANTARES-PRJ/AnnotazioneVCF.git
 cd annovar_tool
 ```
 
@@ -45,8 +61,15 @@ Example: `file = "clinvar"` will refer to hg38_clinvar.txt.
 - **databasesVCF** and **databasesGFF3**: Specify the full file name with the Human genome reference (hg38_, ...) and the extension.
 Example: `file: "hg38_gnomad.vcf"` or `file: "hg38_hgmd.gff3"`.
 
+In the last section of the configuration file config.yaml, there is a **scraping section** where the user must insert, and constantly update, the latest version of the DBs in order to always be notified in case there are new updates on the sites.
+
+For each DB, you need to insert in the changes of the scraping list: `release`, `date` or `genVersion` as indicated in the file. In this way, all the necessary variables are provided to perform a DB update check.
+
+There is also a boolean variable `autoCheck` to automatically request the verification of updates for the above mentioned databases when annotating one or more VCF files.
 
 ## Usage
+
+### Annotate VCF file
 
 To annotate a VCF file, simply run the tool with the `--annotateVCF` (`-a`) option and specify the path to the VCF file. 
 ```
@@ -63,6 +86,10 @@ python annovar_tool.py --annotateVCF /path/to/input.vcf --DBPath /path/to/databa
 
 If you don't specify the database path and destination path, the tool will use the default paths specified in the `config.yaml` file.
 
+### Check Update DB
+
+To check for DB updates, just use the `--checkDB` (`-c`) option to print a table where updates are indicated with a `[!]`.
+
 
 ## Step-by-Step Explanation of the Code
 
@@ -72,7 +99,17 @@ Here's a step-by-step explanation of the code:
 
 2. **Parse the command-line arguments:** The tool then parses the command-line arguments using the `argparse` module. It defines two groups of arguments: one for the `--annotateVCF` option and one for the `--DBPath` and `--DestinationPath` options.
 
-3. ****...
+Add another argument group for the `--checkDB` option
+
+3. **Annotate Files** Check if the `--annotateVCF` argument was provided. If it was, set the VCF file path. If `--DBPath` and `--DestinationPath` were also provided, set these paths as well.
+
+Check if all three paths exist. If they do, proceed with annotating the VCF file using the ANNOVAR database. The annotation is performed using ANNOVAR's table_annovar.pl command, which is run as a system command.
+
+If the path is a directory, iterate over all files in the directory. If the file is a VCF file, perform the annotation as above.
+
+4. **Check Update** If the `--checkDB` option was provided, the functions that perform scraping for each DB site will be executed, and the `tabulateUpdates` function prints a table in the command line. When `autoCheck` is true, they are automatically executed without `--checkDB` but with any annotation command `--annotateVCF`.
+
+5. **Merge** When the annotation files for each DB are created, copies are also created in `result/temp/`, where the files with .txt extension will be read to extract the column of interest, the annotation column, and they will all be concatenated at the end in a final merge .txt file. In the end, the temporary folder is deleted.
 
 
 ## Link and References

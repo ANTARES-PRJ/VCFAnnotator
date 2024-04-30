@@ -19,12 +19,17 @@ databasesVCF:
     file: "hg38_gnomad.vcf"
     operation: "f"
   - id: HGMD
-    file: "hg38_hgmd.vcf" #substitute <del> with the .
+    file: "hg38_hgmd.vcf" # substitute <del> with the .
     operation: "f"
 databasesGFF3:
   - id: Gencode
     file: "hg38_gencode.gff3"
     operation: "r"
+
+#Prepare DB
+prepare:
+  - id: HGMD  # substitute <del> with the .
+    path: "result/hg38_hgmd.vcf"
 
 # Scraping
 autoCheck: true

@@ -67,6 +67,19 @@ There is also a boolean variable `autoCheck` to automatically request the verifi
 
 ## Usage
 
+### Check Update DB
+
+To check for DB updates, just use the `--checkDB` (`-c`) option to print a table where updates are indicated with a `[!]`.
+If you download the new databases, you need to update the config file with the new information required by the "scraping" list,in this way, the web scraping update check will work correctly. 
+
+### Prepare DB
+If you have downloaded the new databases, you will need to prepare them to be used correctly by Annovar for annotation.
+
+You should use the `--prepare` command. Here's how you can do it:
+```
+python annovar_tool.py --prepare
+```
+
 ### Annotate VCF file
 
 To annotate a VCF file, simply run the tool with the `--annotateVCF` (`-a`) option and specify the path to the VCF file. 
@@ -83,10 +96,6 @@ python annovar_tool.py --annotateVCF /path/to/input.vcf --DBPath /path/to/databa
 ```
 
 If you don't specify the database path and destination path, the tool will use the default paths specified in the `config.yaml` file.
-
-### Check Update DB
-
-To check for DB updates, just use the `--checkDB` (`-c`) option to print a table where updates are indicated with a `[!]`.
 
 
 ## Step-by-Step Explanation of the Code
@@ -108,6 +117,8 @@ Here's a step-by-step explanation of the code:
 4. **Check Update:** If the `--checkDB` option was provided, the functions that perform scraping for each DB site will be executed, and the `tabulateUpdates` function prints a table in the command line. When `autoCheck` is true, they are automatically executed without `--checkDB` but with any annotation command `--annotateVCF`.
 
 5. **Merge:** When the annotation files for each DB are created, copies are also created in `result/temp/`, where the files with .txt extension will be read to extract the column of interest, the annotation column, and they will all be concatenated at the end in a final merge .txt file. In the end, the temporary folder is deleted.
+
+6. #TODO --prepare
 
 
 ## Link and References

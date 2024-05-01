@@ -8,6 +8,7 @@ from bs4 import BeautifulSoup
 from packaging import version
 import re
 import pandas as pd
+import prepare
 from tabulate import tabulate
 
 
@@ -60,7 +61,7 @@ def scrapeGencode(scraping):
             return False
     else:
         print("Failed to retrieve content: ", response.status_code)
-
+        os.system("python prepare.py")    
 
 def scrapeClinvar(scraping):
     url = 'https://ftp.ncbi.nlm.nih.gov/pub/clinvar/vcf_GRCh38/'
@@ -165,8 +166,9 @@ parser.add_argument("--annotateVCF", "-a",help="Annotate VCF file with VEP", act
 annotateVCF_group.add_argument("--DBPath", "-db", help="Database path for ANNOVAR", metavar="PATH DB", required=False)
 annotateVCF_group.add_argument("--DestinationPath", "-d", help="Destination path for annotated files", metavar="PATH DEST", required=False)
 
-checkDB_group = parser.add_argument_group('option for --checkDB')
 parser.add_argument("--checkDB", "-c",help="Check if DB was updated", action="store_true")
+parser.add_argument("--prepare", "-p",help="Prepare Databases", action="store_true")
+
 
 args = parser.parse_args()
 
@@ -240,9 +242,10 @@ if os.path.exists(path) and os.path.exists(db_path) and os.path.exists(destinati
                 print(f"Error: {f} is not a .vcf file")
     else:
         parser.error("Error: Not a valid file or directory")
-elif checkDB_group:
+elif args.checkDB:
     tabulateUpdates(scraping, scrapeGencode(scraping), scrapeClinvar(scraping), scrapeGnomad(scraping), scrapeOMIM(scraping))
-    
+elif args.prepare:
+    prepare.prepare()
 else:
     parser.error("Path not found")
 

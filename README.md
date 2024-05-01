@@ -70,12 +70,15 @@ There is also a boolean variable `autoCheck` to automatically request the verifi
 ### Check Update DB
 
 To check for DB updates, just use the `--checkDB` (`-c`) option to print a table where updates are indicated with a `[!]`.
-If you download the new databases, you need to update the config file with the new information required by the "scraping" list,in this way, the web scraping update check will work correctly. 
+If you download the new databases, you need to update the config file with the new information required by the "scraping" list,in this way, the web scraping update check will work correctly. Here's how you can do it:
+```
+python annovar_tool.py --checkDB
+``` 
 
 ### Prepare DB
 If you have downloaded the new databases, you will need to prepare them to be used correctly by Annovar for annotation.
 
-You should use the `--prepare` command. Here's how you can do it:
+You should use the `--prepare` command.
 ```
 python annovar_tool.py --prepare
 ```

@@ -97,6 +97,8 @@ python annovar_tool.py --annotateVCF /path/to/input.vcf --DBPath /path/to/databa
 
 If you don't specify the database path and destination path, the tool will use the default paths specified in the `config.yaml` file.
 
+If you change the default paths within config.yaml, remember to put the "/" character at the end of the folder path.
+
 
 ## Step-by-Step Explanation of the Code
 

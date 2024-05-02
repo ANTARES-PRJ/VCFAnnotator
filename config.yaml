@@ -20,7 +20,7 @@ databasesVCF:
     file: "hg38_gnomad.vcf"
     operation: "f"
   - id: HGMD
-    file: "hg38_hgmd.vcf" # substitute <del> with the .
+    file: "hg38_hgmd.vcf"
     operation: "f"
 databasesGFF3:
   - id: Gencode
@@ -32,7 +32,7 @@ removeDEL:
   - id: HGMD # substitute <del> with the .
     path: "humandb/hg38_HGMD.vcf"
 
-pathClinvar: "humandb/hg38_clinvar.vcf"
+pathClinvar: "humandb/hg38_clinvar.vcf" #convert from .vcf to .txt
 
 # Scraping
 autoCheck: true

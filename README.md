@@ -1,22 +1,13 @@
 # Annovar-Tool
 
 We have developed a tool for the Annovar software, which enables batch processing of VCF files for DNA genome annotation, comparing various databases and scientific notations.
+This tool has the ability to annotate an entire folder of VCF files in a single command and can convert and adapt databases to be compatible with ANNOVAR.
 
 Using the following databases: GnomAD, ClinVar, GENCODE, HGMD, OMIM.
 
+Our tool automatically implements a merge of the output files, so that all the annotations performed for each DB, even in different formats (.txt, .vcf, .gff3), are available in a single file. This is not possible with the stock ANNOVAR software.
+
 Please note that the tool can only annotate VCF files.
-
-The results of the annotation of one or more VCF files, for each individual Database, will be available in the `result/` folder named as follows:
-
-*`DBName_VCFInputName_YYYY-mm-dd_HH_MM_SS(.avinput/.txt/.vcf)`*
-
-Available in all three output formats of Annovar, namely: avinput, txt, and vcf.
-
-In addition, for each annotation, a unique .txt file is also generated for all the DBs with which you wanted to annotate, and it will be named:
-
-*`VCFInputName_result_YYYY-mm-dd_HH_MM_SS.txt`*
-
-It will gather all the annotations into a single file, adding a column for each DB, called as the same, to differentiate the various annotations.
 
 Also, checking for more recent versions of the databases used, performing scraping directly on the download sites of the databases.
 - **Gencode** (https://www.gencodegenes.org/human/)
@@ -100,7 +91,19 @@ python annovar_tool.py --annotateVCF /path/to/input.vcf --DBPath /path/to/databa
 
 If you don't specify the database path and destination path, the tool will use the default paths specified in the `config.yaml` file.
 
-If you change the default paths within config.yaml, remember to put the "/" character at the end of the folder path.
+If you change the default paths within `config.yaml`, remember to put the "/" character at the end of the folder path.
+
+The results of the annotation of one or more VCF files, for each individual Database, will be available in the `result/` folder named as follows:
+
+*`DBName_VCFInputName_YYYY-mm-dd_HH_MM_SS(.avinput/.txt/.vcf)`*
+
+Available in all three output formats of Annovar, namely: avinput, txt, and vcf.
+
+In addition, for each annotation, a unique .txt file is also generated for all the DBs with which you wanted to annotate, and it will be named:
+
+*`VCFInputName_result_YYYY-mm-dd_HH_MM_SS.txt`*
+
+It will gather all the annotations into a single file, adding a column for each DB, called as the same, to differentiate the various annotations.
 
 
 ## Step-by-Step Explanation of the Code
@@ -123,7 +126,7 @@ Here's a step-by-step explanation of the code:
 
 5. **Merge:** When the annotation files for each DB are created, copies are also created in `result/temp/`, where the files with .txt extension will be read to extract the column of interest, the annotation column, and they will all be concatenated at the end in a final merge .txt file. In the end, the temporary folder is deleted.
 
-6. #TODO --prepare
+6. **Prepare:** A database preparation procedure is executed with the '--prepare' command. This will perform two main functions: convert the Clinvar DB from .VCF to .TXT, thus bypassing some reading errors by Annovar, and the automatic replacement of the error string "" with "." in the ALT column of the HGMD DB, this because Annovar recognizes the character "." as a missing value and not other characters. The paths of the two original DBs must be reported in the appropriate section of config.yaml. The result of the conversion will be saved in 'db_path'.
 
 
 ## Link and References

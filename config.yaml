@@ -1,5 +1,6 @@
 # config.yaml
 
+# db_path and destination_path must have the trailing slash
 # defaultPath: humandb/
 db_path: "humandb/" #Change this to take a different path for the databases
 
@@ -19,12 +20,19 @@ databasesVCF:
     file: "hg38_gnomad.vcf"
     operation: "f"
   - id: HGMD
-    file: "hg38_hgmd.vcf" #substitute <del> with the .
+    file: "hg38_hgmd.vcf"
     operation: "f"
 databasesGFF3:
   - id: Gencode
     file: "hg38_gencode.gff3"
     operation: "r"
+
+#Prepare DB
+removeDEL:
+  - id: HGMD # substitute <del> with the .
+    path: "humandb/hg38_HGMD.vcf"
+
+pathClinvar: "humandb/hg38_clinvar.vcf" #convert from .vcf to .txt
 
 # Scraping
 autoCheck: true

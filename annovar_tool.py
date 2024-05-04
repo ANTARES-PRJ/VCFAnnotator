@@ -180,6 +180,8 @@ if args.annotateVCF:
         db_path = args.DBPath
     if args.DestinationPath:
         destination_path = args.DestinationPath
+    elif not os.path.exists(destination_path):
+        os.makedirs(destination_path)
 else:
     if args.DBPath or args.DestinationPath:
         parser.error("Le opzioni -DBPath/-db e -DestinationPath/-d sono obbligatorie con --annotateVCF.")

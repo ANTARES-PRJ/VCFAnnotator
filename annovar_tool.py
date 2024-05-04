@@ -30,17 +30,18 @@ def mergeColumns(path):
         data = pd.read_csv(dest + fname, sep='\t')
         if i == 0:
             combined_data = data
-        for db in conf['databasesTXT']:
-            if db['file'] in data.columns:
-                column_name = db['file']            
-        if not column_name: 
+        if conf['databasesTXT']: #if there are databasesTXT in the config file
+            for db in conf['databasesTXT']:
+                if db['file'] in data.columns:
+                    column_name = db['file']            
+        if not column_name:
             column_name = 'vcf' if 'vcf' in data.columns else 'gff3' if 'gff3' in data.columns else ValueError("No column found")
         combined_data[fname] = data[column_name]
         if i == 0:
             combined_data.drop(column_name, axis=1, inplace=True) 
         column_name = ''
         nameFile,ext = os.path.splitext(os.path.basename(path))
-    combined_data.to_csv(nameFile+'_result_'+datetime.now().strftime('%Y-%m-%d_%H_%M_%S')+'.txt', sep='\t', index=False)
+    combined_data.to_csv(destination_path+nameFile+'_result_'+datetime.now().strftime('%Y-%m-%d_%H_%M_%S')+'.txt', sep='\t', index=False)
     shutil.rmtree(dest)
     
     

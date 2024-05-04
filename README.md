@@ -35,7 +35,7 @@ cd annovar_tool
 
 ## Configuration
 
-The tool uses a YAML configuration file named `config.yaml` to specify the default paths for the database and the destination folder for the annotated VCF files. You can modify these paths to suit your needs.
+The tool uses a YAML configuration file named `config.yaml` to specify the default paths for the database and the destination folder for the annotated VCF files. You can modify these paths to suit your needs. Please note that the final `/` character must be inserted.
 
 In the following section, databases needed for annotation should be inserted into their respective lists (databasesTXT, databasesVCF, databasesGFF3) according to the database format. The Python code will automatically recognize the quantity and extension, and perform annotation autonomously using the provided databases.
 
@@ -82,18 +82,19 @@ python annovar_tool.py --annotateVCF /path/to/input.vcf
 ```
 
 You can also specify the database path and destination path using the `--DBPath` (`-db`) and `--DestinationPath` (`-d`) options, respectively.
+Please insert `/` at the end of the path.
 
 Here's an example command:
 
 ```
-python annovar_tool.py --annotateVCF /path/to/input.vcf --DBPath /path/to/database --DestinationPath /path/to/output_folder
+python annovar_tool.py --annotateVCF /path/to/input.vcf --DBPath /path/to/database/ --DestinationPath /path/to/output_folder/
 ```
 
 If you don't specify the database path and destination path, the tool will use the default paths specified in the `config.yaml` file.
 
 If you change the default paths within `config.yaml`, remember to put the "/" character at the end of the folder path.
 
-The results of the annotation of one or more VCF files, for each individual Database, will be available in the `result/` folder named as follows:
+The results of the annotation of one or more VCF files, for each individual Database, will be available in the `destination_path` folder named as follows:
 
 *`DBName_VCFInputName_YYYY-mm-dd_HH_MM_SS(.avinput/.txt/.vcf)`*
 

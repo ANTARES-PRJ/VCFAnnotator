@@ -24,21 +24,26 @@ def mergeColumns(path):
     dest = destination_path + "temp/"
     files = sorted([file for file in os.listdir(dest) if file.endswith('.txt')])
     combined_data = pd.DataFrame()
+    columns_transferred = set()  # Insieme per tenere traccia delle colonne già trasferite
     print(enumerate(files))
     column_name = ''
     for i, fname in enumerate(files):
         data = pd.read_csv(dest + fname, sep='\t')
         if i == 0:
             combined_data = data
+        clinvarData = ['CLNALLELEID', 'CLNDN', 'CLNDISDB', 'CLNREVSTAT', 'CLNSIG']
         if conf['databasesTXT']: #if there are databasesTXT in the config file
-            for db in conf['databasesTXT']:
-                if db['file'] in data.columns:
-                    column_name = db['file']            
-        if not column_name:
+            j=0
+            for cl_name in clinvarData:
+                if cl_name in data.columns:
+                    combined_data[cl_name] = data[cl_name]   
+                    if i == 0:
+                        combined_data.drop_duplicates(keep='last',subset=cl_name)      
+        if not column_name and ('vcf' in data.columns or 'gff3' in data.columns):  
             column_name = 'vcf' if 'vcf' in data.columns else 'gff3' if 'gff3' in data.columns else ValueError("No column found")
-        combined_data[fname] = data[column_name]
-        if i == 0:
-            combined_data.drop(column_name, axis=1, inplace=True) 
+            combined_data[fname] = data[column_name]
+            if i == 0:
+                combined_data.drop(columns=[column_name], inplace=True)      
         column_name = ''
         nameFile,ext = os.path.splitext(os.path.basename(path))
     combined_data.to_csv(destination_path+nameFile+'_result_'+datetime.now().strftime('%Y-%m-%d_%H_%M_%S')+'.txt', sep='\t', index=False)

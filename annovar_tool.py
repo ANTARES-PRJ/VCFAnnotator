@@ -24,7 +24,6 @@ def mergeColumns(path):
     dest = destination_path + "temp/"
     files = sorted([file for file in os.listdir(dest) if file.endswith('.txt')])
     combined_data = pd.DataFrame()
-    columns_transferred = set()  # Insieme per tenere traccia delle colonne già trasferite
     print(enumerate(files))
     column_name = ''
     for i, fname in enumerate(files):
@@ -46,9 +45,25 @@ def mergeColumns(path):
                 combined_data.drop(columns=[column_name], inplace=True)      
         column_name = ''
         nameFile,ext = os.path.splitext(os.path.basename(path))
-    combined_data.to_csv(destination_path+nameFile+'_result_'+datetime.now().strftime('%Y-%m-%d_%H_%M_%S')+'.txt', sep='\t', index=False)
+    file = destination_path+nameFile+'_result_'+datetime.now().strftime('%Y-%m-%d_%H_%M_%S')+'.txt'
+    combined_data.to_csv(file, sep='\t', index=False)
     shutil.rmtree(dest)
     
+    #TODO: gestire la possibilità che venga rimosso HGMD dal config
+    df = pd.read_csv(file, sep="\t")              
+    newColumb = ['CLASS', 'MUT', 'GENE', 'STRAND', 'DNA', 'PROT', 'DB', 'PHEN', 'RANKSCORE', 'SVTYPE', 'END', 'SVLEN']
+    nameColumb = 'HGMD.hg38_multianno.txt'
+    for nc in newColumb:
+        df[nc] = '.'
+    hgmd_split = df[nameColumb].str.split(";", expand=True)
+    
+    for index, row in hgmd_split.iterrows():
+        for value in row.dropna():  # Usa dropna per ignorare i valori NaN
+            if(value != '.' and value is not None) :
+                hgmdColSplit = value.split("=")[0]
+                df.loc[index, hgmdColSplit] = value.split("=")[1]
+    df.to_csv(file, sep='\t',index=False)
+
     
 def scrapeGencode(scraping):
     url = 'https://www.gencodegenes.org/human/releases.html'

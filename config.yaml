@@ -1,5 +1,7 @@
 # config.yaml
 
+#YOU MUST NOT CHANGE THE ID
+
 # db_path and destination_path must have the trailing slash
 # defaultPath: humandb/
 db_path: "humandb/" #Change this to take a different path for the databases

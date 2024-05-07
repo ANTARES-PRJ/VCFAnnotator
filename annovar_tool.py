@@ -62,6 +62,7 @@ def mergeColumns(path):
             if(value != '.' and value is not None) :
                 hgmdColSplit = value.split("=")[0]
                 df.loc[index, hgmdColSplit] = value.split("=")[1]
+    df.drop(columns=[nameColumb], inplace=True)      
     df.to_csv(file, sep='\t',index=False)
 
     

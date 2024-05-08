@@ -49,7 +49,7 @@ def mergeColumns(path):
     combined_data.to_csv(file, sep='\t', index=False)
     shutil.rmtree(dest)
     
-    #TODO: rendere il nome colonna dinamico
+    #TODO: prendere il nome colonna dinamicamente
     if 'HGMD' in conf['databasesVCF']['id']:
         df = pd.read_csv(file, sep="\t")              
         newColumb = ['CLASS', 'MUT', 'GENE', 'STRAND', 'DNA', 'PROT', 'DB', 'PHEN', 'RANKSCORE', 'SVTYPE', 'END', 'SVLEN']

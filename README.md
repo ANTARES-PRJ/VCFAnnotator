@@ -106,6 +106,8 @@ In addition, for each annotation, a unique .txt file is also generated for all t
 
 It will gather all the annotations into a single file, adding a column for each DB, called as the same, to differentiate the various annotations.
 
+For the clinvar and hgmd annotations, we have made sure to **divide** the annotation into **different columns**
+
 
 ## Step-by-Step Explanation of the Code
 
@@ -127,7 +129,13 @@ Here's a step-by-step explanation of the code:
 
 5. **Merge:** When the annotation files for each DB are created, copies are also created in `result/temp/`, where the files with .txt extension will be read to extract the column of interest, the annotation column, and they will all be concatenated at the end in a final merge .txt file. In the end, the temporary folder is deleted.
 
-6. **Prepare:** A database preparation procedure is executed with the '--prepare' command. This will perform two main functions: convert the Clinvar DB from .VCF to .TXT, thus bypassing some reading errors by Annovar, and the automatic replacement of the error string "" with "." in the ALT column of the HGMD DB, this because Annovar recognizes the character "." as a missing value and not other characters. The paths of the two original DBs must be reported in the appropriate section of config.yaml. The result of the conversion will be saved in 'db_path'.
+6. **Separe Columns:** If the HGMD id is present in the config.yaml file then it means that there will be a column in the file obtained from the merge of DBs (previous step), new columns will be created, initially filled with the None “.” character, then by cycling all rows in the column `HGMD.hg38_multiyear.txt` the correct values in the respective row/column will be substituted by performing a stand for “;” and “=”.
+The new columns are as follows:
+`['CLASS', 'MUT', 'GENE', 'STRAND', 'DNA', 'PROT', 'DB', 'PHEN', 'RANKSCORE', 'SVTYPE', 'END', 'SVLEN']`
+are taken from the 2024/01 HGMD DB, if there are more columns in the new DBs just add them to this list called `newColumb` in the `annorar_tool.py` file.
+
+7. **Prepare:** A database preparation procedure is executed with the '--prepare' command. This will perform two main functions: convert the Clinvar DB from .VCF to .TXT, thus bypassing some reading errors by Annovar, and the automatic replacement of the error string "" with "." in the ALT column of the HGMD DB, this because Annovar recognizes the character "." as a missing value and not other characters. The paths of the two original DBs must be reported in the appropriate section of config.yaml. The result of the conversion will be saved in 'db_path'.
+
 
 
 ## Link and References

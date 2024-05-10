@@ -19,8 +19,9 @@ def generateTemp(fileName, fileNameTemp):
     shutil.copy(fileName + ".hg38_multianno.txt", fileNameTemp + ".hg38_multianno.txt")
     # the names of the files will be the names of the columns
     
+#TODO: Colonne Dei TXT Dinamiche da config(?) 
 def mergeColumns(path):
-    conf['databasesTXT']  
+    conf['databasesTXT']  #! non dovrebbe essere in una variabile?
     dest = destination_path + "temp/"
     files = sorted([file for file in os.listdir(dest) if file.endswith('.txt')])
     combined_data = pd.DataFrame()
@@ -31,8 +32,9 @@ def mergeColumns(path):
         if i == 0:
             combined_data = data
         clinvarData = ['CLNALLELEID', 'CLNDN', 'CLNDISDB', 'CLNREVSTAT', 'CLNSIG']
+        #TODO: togliere il _
+        omimData = ['MIM_Number', 'Gene/Locus_And_Other_Related_Symbols', 'Gene_Name', 'Approved_Gene_Symbol', 'Entrez_Gene_ID', 'Ensembl_Gene_ID', 'Comments', 'Phenotypes', 'Mouse_Gene_Symbol/ID']
         if conf['databasesTXT']: #if there are databasesTXT in the config file
-            j=0
             for cl_name in clinvarData:
                 if cl_name in data.columns:
                     combined_data[cl_name] = data[cl_name]   
@@ -49,23 +51,24 @@ def mergeColumns(path):
     combined_data.to_csv(file, sep='\t', index=False)
     shutil.rmtree(dest)
     
-    #TODO: prendere il nome colonna dinamicamente
-    if 'HGMD' in conf['databasesVCF']['id']:
-        df = pd.read_csv(file, sep="\t")              
-        newColumb = ['CLASS', 'MUT', 'GENE', 'STRAND', 'DNA', 'PROT', 'DB', 'PHEN', 'RANKSCORE', 'SVTYPE', 'END', 'SVLEN']
-        nameColumb = 'HGMD.hg38_multianno.txt'
-        # create a new column with the name of the new columns
-        for nc in newColumb:
-            df[nc] = '.'    # None charter for empty cells
-        hgmd_split = df[nameColumb].str.split(";", expand=True)
-        
-        for index, row in hgmd_split.iterrows():
-            for value in row.dropna():  # Usa dropna per ignorare i valori NaN
-                if(value != '.' and value is not None) :
-                    hgmdColSplit = value.split("=")[0]
-                    df.loc[index, hgmdColSplit] = value.split("=")[1]
-        df.drop(columns=[nameColumb], inplace=True)      
-        df.to_csv(file, sep='\t',index=False)
+    #TODO: prendere il nome colonna dinamicamente --> magari con una varibile globale per ogni DB in modo da modificarla una sola volta
+    # se la lista non è vuota ed è attivo HGMD
+    if conf['databasesVCF'] and 'HGMD' in conf['databasesVCF']['id']:
+            df = pd.read_csv(file, sep="\t")              
+            newColumb = ['CLASS', 'MUT', 'GENE', 'STRAND', 'DNA', 'PROT', 'DB', 'PHEN', 'RANKSCORE', 'SVTYPE', 'END', 'SVLEN']
+            nameColumb = 'HGMD.hg38_multianno.txt'
+            # create a new column with the name of the new columns
+            for nc in newColumb:
+                df[nc] = '.'    # None charter for empty cells
+            hgmd_split = df[nameColumb].str.split(";", expand=True)
+            
+            for index, row in hgmd_split.iterrows():
+                for value in row.dropna():  # Usa dropna per ignorare i valori NaN
+                    if(value != '.' and value is not None) :
+                        hgmdColSplit = value.split("=")[0]
+                        df.loc[index, hgmdColSplit] = value.split("=")[1]
+            df.drop(columns=[nameColumb], inplace=True)      
+            df.to_csv(file, sep='\t',index=False)
 
     
 def scrapeGencode(scraping):

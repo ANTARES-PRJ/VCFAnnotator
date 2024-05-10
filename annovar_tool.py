@@ -11,6 +11,13 @@ import pandas as pd
 import prepare
 from tabulate import tabulate
 
+#Name of Columns for the databases in TXT format to be merged
+ClinvarColumns = ['CLNALLELEID', 'CLNDN', 'CLNDISDB', 'CLNREVSTAT', 'CLNSIG']
+OmimColumns = ['MIM Number', 'Gene/Locus And Other Related Symbols', 'Gene Name', 'Approved Gene Symbol', 'Entrez Gene ID', 'Ensembl Gene ID', 'Comments', 'Phenotypes', 'Mouse Gene Symbol/ID']
+#Name of Columns for the databases in VCF format to be split
+HGMDColumns = ['CLASS', 'MUT', 'GENE', 'STRAND', 'DNA', 'PROT', 'DB', 'PHEN', 'RANKSCORE', 'SVTYPE', 'END', 'SVLEN']
+GenomADColumns = ['AC', 'AN', 'AF']
+
 
 def generateTemp(fileName, fileNameTemp):
     dest = destination_path + "temp/"
@@ -21,30 +28,31 @@ def generateTemp(fileName, fileNameTemp):
     
 #TODO: Colonne Dei TXT Dinamiche da config(?) 
 def mergeColumns(path):
-    conf['databasesTXT']  #! non dovrebbe essere in una variabile?
+    #! conf['databasesTXT']  #! non dovrebbe essere in una variabile?
     dest = destination_path + "temp/"
     files = sorted([file for file in os.listdir(dest) if file.endswith('.txt')])
     combined_data = pd.DataFrame()
-    print(enumerate(files))
+    #print(enumerate(files))
+    print("Merging columns...")
     column_name = ''
     for i, fname in enumerate(files):
         data = pd.read_csv(dest + fname, sep='\t')
         if i == 0:
             combined_data = data
-        clinvarData = ['CLNALLELEID', 'CLNDN', 'CLNDISDB', 'CLNREVSTAT', 'CLNSIG']
-        #TODO: togliere il _
-        omimData = ['MIM_Number', 'Gene/Locus_And_Other_Related_Symbols', 'Gene_Name', 'Approved_Gene_Symbol', 'Entrez_Gene_ID', 'Ensembl_Gene_ID', 'Comments', 'Phenotypes', 'Mouse_Gene_Symbol/ID']
-        if conf['databasesTXT']: #if there are databasesTXT in the config file
-            for cl_name in clinvarData:
-                if cl_name in data.columns:
-                    combined_data[cl_name] = data[cl_name]   
-                    if i == 0:
-                        combined_data.drop_duplicates(keep='last',subset=cl_name)      
+             
         if not column_name and ('vcf' in data.columns or 'gff3' in data.columns):  
             column_name = 'vcf' if 'vcf' in data.columns else 'gff3' if 'gff3' in data.columns else ValueError("No column found")
             combined_data[fname] = data[column_name]
             if i == 0:
-                combined_data.drop(columns=[column_name], inplace=True)      
+                combined_data.drop(columns=[column_name], inplace=True)   
+        elif i != 0:
+            if conf['databasesTXT']: #if there are databasesTXT in the config file
+                #Clinvar e OMIM
+                for cl_name in ClinvarColumns + OmimColumns:
+                    if cl_name in data.columns:
+                        combined_data[cl_name] = data[cl_name]
+                        #! if i == 0:
+                            #! combined_data.drop_duplicates(keep='last',subset=cl_name) 
         column_name = ''
         nameFile,ext = os.path.splitext(os.path.basename(path))
     file = destination_path+nameFile+'_result_'+datetime.now().strftime('%Y-%m-%d_%H_%M_%S')+'.txt'
@@ -52,15 +60,17 @@ def mergeColumns(path):
     shutil.rmtree(dest)
     
     #TODO: prendere il nome colonna dinamicamente --> magari con una varibile globale per ogni DB in modo da modificarla una sola volta
-    # se la lista non è vuota ed è attivo HGMD
+    #? Split DatabasesVCF
+    # se la lista non è vuota
     if conf['databasesVCF']:
         for database in conf['databasesVCF']:
+            #è attivo HGMD
             if 'id' in database and database['id'] == 'HGMD':
+                print("Split HGMD columns...")
                 df = pd.read_csv(file, sep="\t")              
-                newColumb = ['CLASS', 'MUT', 'GENE', 'STRAND', 'DNA', 'PROT', 'DB', 'PHEN', 'RANKSCORE', 'SVTYPE', 'END', 'SVLEN']
                 nameColumb = 'HGMD.hg38_multianno.txt'
                 # create a new column with the name of the new columns
-                for nc in newColumb:
+                for nc in HGMDColumns:
                     df[nc] = '.'    # None charter for empty cells
                 hgmd_split = df[nameColumb].str.split(";", expand=True)
                 
@@ -72,8 +82,28 @@ def mergeColumns(path):
 
                 df.drop(columns=[nameColumb], inplace=True)      
                 df.to_csv(file, sep='\t',index=False)
-                    
+            #TODO GenomAD
+            if 'id' in database and database['id'] == 'genomAD':
+                print("Split genomAD columns...")
+                df = pd.read_csv(file, sep="\t")              
+                nameColumb = 'genomAD.hg38_multianno.txt'
+                # create a new column with the name of the new columns
+                for nc in GenomADColumns:
+                    df[nc] = '.'    # None charter for empty cells
+                genomAD_split = df[nameColumb].str.split(";", expand=True)
                 
+                for index, row in genomAD_split.iterrows():
+                    for value in row.dropna():  # Usa dropna per ignorare i valori NaN
+                        if(value != '.' and value is not None) :
+                            genomADColSplit = value.split("=")[0]
+                            if genomADColSplit in GenomADColumns:
+                                df.loc[index, genomADColSplit] = value.split("=")[1]
+
+                df.drop(columns=[nameColumb], inplace=True)      
+                df.to_csv(file, sep='\t',index=False)
+    print("Merging and Splitting columns complete!")
+
+
     
 def scrapeGencode(scraping):
     url = 'https://www.gencodegenes.org/human/releases.html'
@@ -280,6 +310,6 @@ elif args.checkDB:
 elif args.prepare:
     prepare.prepare()
 else:
-    parser.error("Path not found")
+    parser.error("Error: Invalid command line input. Please check your syntax or path and try again.")
 
 

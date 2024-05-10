@@ -14,14 +14,14 @@ databasesTXT:
   - id: Clinvar
     file: "clinvar"
     operation: "f"
-#- id: OMIM
-#  file: "omim"
-#  operation: "f"
+  - id: OMIM
+    file: "omim"
+    operation: "f"
 databasesVCF: # ;
-  - id: genomAD
+  - id: genomAD  #this ID must be unchanged
     file: "hg38_gnomad.vcf"
     operation: "f"
-  - id: HGMD
+  - id: HGMD      #this ID must be unchanged
     file: "hg38_hgmd.vcf"
     operation: "f"
 databasesGFF3: # ,

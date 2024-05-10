@@ -16,7 +16,7 @@ ClinvarColumns = ['CLNALLELEID', 'CLNDN', 'CLNDISDB', 'CLNREVSTAT', 'CLNSIG']
 OmimColumns = ['MIM Number', 'Gene/Locus And Other Related Symbols', 'Gene Name', 'Approved Gene Symbol', 'Entrez Gene ID', 'Ensembl Gene ID', 'Comments', 'Phenotypes', 'Mouse Gene Symbol/ID']
 #Name of Columns for the databases in VCF format to be split
 HGMDColumns = ['CLASS', 'MUT', 'GENE', 'STRAND', 'DNA', 'PROT', 'DB', 'PHEN', 'RANKSCORE', 'SVTYPE', 'END', 'SVLEN']
-GenomADColumns = ['AC', 'AN', 'AF']
+gnomADColumns = ['AC', 'AN', 'AF']
 
 
 def generateTemp(fileName, fileNameTemp):
@@ -82,22 +82,22 @@ def mergeColumns(path):
 
                 df.drop(columns=[nameColumb], inplace=True)      
                 df.to_csv(file, sep='\t',index=False)
-            #TODO GenomAD
-            if 'id' in database and database['id'] == 'genomAD':
-                print("Split genomAD columns...")
+            
+            elif 'id' in database and database['id'] == 'gnomAD':
+                print("Split gnomAD columns...")
                 df = pd.read_csv(file, sep="\t")              
-                nameColumb = 'genomAD.hg38_multianno.txt'
+                nameColumb = 'gnomAD.hg38_multianno.txt'
                 # create a new column with the name of the new columns
-                for nc in GenomADColumns:
+                for nc in gnomADColumns:
                     df[nc] = '.'    # None charter for empty cells
-                genomAD_split = df[nameColumb].str.split(";", expand=True)
+                gnomAD_split = df[nameColumb].str.split(";", expand=True)
                 
-                for index, row in genomAD_split.iterrows():
+                for index, row in gnomAD_split.iterrows():
                     for value in row.dropna():  # Usa dropna per ignorare i valori NaN
                         if(value != '.' and value is not None) :
-                            genomADColSplit = value.split("=")[0]
-                            if genomADColSplit in GenomADColumns:
-                                df.loc[index, genomADColSplit] = value.split("=")[1]
+                            gnomADColSplit = value.split("=")[0]
+                            if gnomADColSplit in gnomADColumns:
+                                df.loc[index, gnomADColSplit] = value.split("=")[1]
 
                 df.drop(columns=[nameColumb], inplace=True)      
                 df.to_csv(file, sep='\t',index=False)

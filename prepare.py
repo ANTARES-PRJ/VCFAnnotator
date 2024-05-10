@@ -47,6 +47,7 @@ def prepareHGMD():
                     columns = line.split('\t')
                     alt_column = columns[4].replace('<DEL>', '.')
                     columns[4] = alt_column
+                    columns = [col.replace('%3A', ':').replace('%3B', ';').replace('%3D', '=') for col in columns]
                     output_file.write('\t'.join(columns))
         shutil.rmtree(dest)
         print(f"Prepare {p['id']} - String \"<DEL>\" replacement complete!")

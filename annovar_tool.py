@@ -53,23 +53,27 @@ def mergeColumns(path):
     
     #TODO: prendere il nome colonna dinamicamente --> magari con una varibile globale per ogni DB in modo da modificarla una sola volta
     # se la lista non è vuota ed è attivo HGMD
-    if conf['databasesVCF'] and 'HGMD' in conf['databasesVCF']['id']:
-            df = pd.read_csv(file, sep="\t")              
-            newColumb = ['CLASS', 'MUT', 'GENE', 'STRAND', 'DNA', 'PROT', 'DB', 'PHEN', 'RANKSCORE', 'SVTYPE', 'END', 'SVLEN']
-            nameColumb = 'HGMD.hg38_multianno.txt'
-            # create a new column with the name of the new columns
-            for nc in newColumb:
-                df[nc] = '.'    # None charter for empty cells
-            hgmd_split = df[nameColumb].str.split(";", expand=True)
-            
-            for index, row in hgmd_split.iterrows():
-                for value in row.dropna():  # Usa dropna per ignorare i valori NaN
-                    if(value != '.' and value is not None) :
-                        hgmdColSplit = value.split("=")[0]
-                        df.loc[index, hgmdColSplit] = value.split("=")[1]
-            df.drop(columns=[nameColumb], inplace=True)      
-            df.to_csv(file, sep='\t',index=False)
+    if conf['databasesVCF']:
+        for database in conf['databasesVCF']:
+            if 'id' in database and database['id'] == 'HGMD':
+                df = pd.read_csv(file, sep="\t")              
+                newColumb = ['CLASS', 'MUT', 'GENE', 'STRAND', 'DNA', 'PROT', 'DB', 'PHEN', 'RANKSCORE', 'SVTYPE', 'END', 'SVLEN']
+                nameColumb = 'HGMD.hg38_multianno.txt'
+                # create a new column with the name of the new columns
+                for nc in newColumb:
+                    df[nc] = '.'    # None charter for empty cells
+                hgmd_split = df[nameColumb].str.split(";", expand=True)
+                
+                for index, row in hgmd_split.iterrows():
+                    for value in row.dropna():  # Usa dropna per ignorare i valori NaN
+                        if(value != '.' and value is not None) :
+                            hgmdColSplit = value.split("=")[0]
+                            df.loc[index, hgmdColSplit] = value.split("=")[1]
 
+                df.drop(columns=[nameColumb], inplace=True)      
+                df.to_csv(file, sep='\t',index=False)
+                    
+                
     
 def scrapeGencode(scraping):
     url = 'https://www.gencodegenes.org/human/releases.html'

@@ -99,5 +99,3 @@ def prepare():
     prepareHGMD()
     prepareClinvar()
     prepareOMIM()
-    
-    

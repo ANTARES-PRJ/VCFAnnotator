@@ -134,7 +134,7 @@ The new columns are as follows:
 `['CLASS', 'MUT', 'GENE', 'STRAND', 'DNA', 'PROT', 'DB', 'PHEN', 'RANKSCORE', 'SVTYPE', 'END', 'SVLEN']`
 are taken from the 2024/01 HGMD DB, if there are more columns in the new DBs just add them to this list called `newColumb` in the `annorar_tool.py` file.
 
-7. **Prepare:** A database preparation procedure is executed with the '--prepare' command. This will perform two main functions: convert the Clinvar DB from .VCF to .TXT, thus bypassing some reading errors by Annovar, and the automatic replacement of the error string "" with "." in the ALT column of the HGMD DB, this because Annovar recognizes the character "." as a missing value and not other characters. The paths of the two original DBs must be reported in the appropriate section of config.yaml. The result of the conversion will be saved in 'db_path'.
+7. **Prepare:** A database preparation procedure is executed with the  `--prepare ` command. This will perform two main functions: convert the Clinvar DB from .VCF to .TXT, thus bypassing some reading errors by Annovar, and the automatic replacement of the error string "" with "." in the ALT column of the HGMD DB, this because Annovar recognizes the character "." as a missing value and not other characters. The paths of the two original DBs must be reported in the appropriate section of config.yaml. The result of the conversion will be saved in  `db_path `.
 
 
 

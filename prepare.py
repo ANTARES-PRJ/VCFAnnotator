@@ -35,7 +35,7 @@ def prepareHGMD():
         dest = conf['db_path'] + "temp/"
         if not os.path.exists(dest):
             os.makedirs(dest)
-            shutil.copy(p['path'], dest+name+".vcf")
+        shutil.copy(p['path'], dest+name+".vcf")
             
         with open(dest+name+".vcf", 'r', encoding='utf-8') as file:
             # Open a new file for writing the modified VCF data
@@ -51,8 +51,8 @@ def prepareHGMD():
                     output_file.write('\t'.join(columns))
         shutil.rmtree(dest)
         print(f"Prepare {p['id']} - String \"<DEL>\" replacement complete!")
-        # Convert Clinvar DB from VCF to TXT
-
+        
+# Convert Clinvar DB from VCF to TXT
 def prepareClinvar():
     detailed_format_lines = []
     file_path = conf['pathClinvar']
@@ -72,9 +72,30 @@ def prepareClinvar():
     detailed_annovar_df.to_csv(output_file_path_detailed, sep='\t', index=False, header=True)
     print("Prepare Clinvar - Format converted from vcf to txt!")
     
-# Prepare HGMD
+def prepareOMIM():
+    # Remove All # comment exclude the "#Chr ..." line
+    for p in conf['clean']:
+        #duplicate a file
+        name = p['path'].split('/')[-1].split('.')[0]
+        dest = conf['db_path'] + "temp/"
+        if not os.path.exists(dest):
+            os.makedirs(dest)
+        shutil.copy(p['path'], dest+name+".txt")
+            
+        with open(dest+name+".txt", 'r', encoding='utf-8') as file:
+            # Open a new file for writing the modified VCF data
+            with open(f"{conf['db_path']}{name}.txt", 'w', encoding='utf-8') as output_file:
+                for line in file:
+                    if line.startswith('#'):
+                        if line.startswith(('# Chromosome\t', '#Chr\t', '#CHROM\t')):
+                            output_file.write(line)
+                        continue
+                    output_file.write(line)
+        shutil.rmtree(dest)
+        print(f"Prepare {p['id']} - Cleaner complete!")
+
+
 def prepare():
     prepareHGMD()
     prepareClinvar()
-    
-    
+    prepareOMIM()

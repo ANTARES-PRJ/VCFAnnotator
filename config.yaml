@@ -14,14 +14,14 @@ databasesTXT:
   - id: Clinvar
     file: "clinvar"
     operation: "f"
-#- id: OMIM
-#  file: "omim"
-#  operation: "f"
-databasesVCF: # ;
-  - id: genomAD
-    file: "hg38_gnomad.vcf"
+  - id: OMIM
+    file: "omim"
     operation: "f"
-  - id: HGMD
+databasesVCF: # ;
+  - id: gnomAD  #this ID must be unchanged
+    file: "hg38_gnomadExomesY.vcf"
+    operation: "f"
+  - id: HGMD      #this ID must be unchanged
     file: "hg38_hgmd.vcf"
     operation: "f"
 databasesGFF3: # ,
@@ -35,6 +35,10 @@ removeDEL:
     path: "humandb/hg38_HGMD.vcf"
 
 pathClinvar: "humandb/hg38_clinvar.vcf" #convert from .vcf to .txt
+
+clean:  #remove the #comment from the file
+  - id: OMIM
+    path: "humandb/hg38_omim.txt"
 
 # Scraping
 autoCheck: false

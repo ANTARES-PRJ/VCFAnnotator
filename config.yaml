@@ -11,23 +11,23 @@ destination_path: "result/" #Change this to take a different path for the Annota
 
 # nameOfDB
 databasesTXT:
-  #- id: Clinvar
-    #file: "clinvar"
-    #operation: "f"
+  - id: Clinvar
+    file: "clinvar"
+    operation: "f"
   - id: OMIM
     file: "omim"
     operation: "f"
 databasesVCF: # ;
-  #- id: gnomAD  #this ID must be unchanged
-    #file: "hg38_gnomadExomesY.vcf"
-    #operation: "f"
-  #- id: HGMD      #this ID must be unchanged
-    #file: "hg38_hgmd.vcf"
-    #operation: "f"
+  - id: gnomAD  #this ID must be unchanged
+    file: "hg38_gnomadExomesY.vcf"
+    operation: "f"
+  - id: HGMD      #this ID must be unchanged
+    file: "hg38_hgmd.vcf"
+    operation: "f"
 databasesGFF3: # ,
-  #- id: Gencode
-    #file: "hg38_gencode.gff3"
-    #operation: "r"
+  - id: Gencode
+    file: "hg38_gencode.gff3"
+    operation: "r"
 
 #Prepare DB
 removeDEL:
@@ -38,8 +38,7 @@ pathClinvar: "humandb/hg38_clinvar.vcf" #convert from .vcf to .txt
 
 clean:  #remove the #comment from the file
   - id: OMIM
-    #path: "humandb/hg38_omim.txt"
-    path: "/Volumes/SSD/Tesi/DB/OMIM/genemap2.txt"
+    path: "humandb/hg38_omim.txt"
 
 # Scraping
 autoCheck: false

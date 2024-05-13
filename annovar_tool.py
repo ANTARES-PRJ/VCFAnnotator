@@ -26,9 +26,8 @@ def generateTemp(fileName, fileNameTemp):
     shutil.copy(fileName + ".hg38_multianno.txt", fileNameTemp + ".hg38_multianno.txt")
     # the names of the files will be the names of the columns
     
-#TODO: Colonne Dei TXT Dinamiche da config(?) 
+
 def mergeColumns(path):
-    #! conf['databasesTXT']  #! non dovrebbe essere in una variabile?
     dest = destination_path + "temp/"
     files = sorted([file for file in os.listdir(dest) if file.endswith('.txt')])
     combined_data = pd.DataFrame()
@@ -51,8 +50,6 @@ def mergeColumns(path):
                 for cl_name in ClinvarColumns + OmimColumns:
                     if cl_name in data.columns:
                         combined_data[cl_name] = data[cl_name]
-                        #! if i == 0:
-                            #! combined_data.drop_duplicates(keep='last',subset=cl_name) 
         column_name = ''
         nameFile,ext = os.path.splitext(os.path.basename(path))
     file = destination_path+nameFile+'_result_'+datetime.now().strftime('%Y-%m-%d_%H_%M_%S')+'.txt'
@@ -61,11 +58,9 @@ def mergeColumns(path):
     
     #TODO: prendere il nome colonna dinamicamente --> magari con una varibile globale per ogni DB in modo da modificarla una sola volta
     #? Split DatabasesVCF
-    # se la lista non è vuota
-    if conf['databasesVCF']:
+    if conf['databasesVCF']:    # if list is not empty
         for database in conf['databasesVCF']:
-            #è attivo HGMD
-            if 'id' in database and database['id'] == 'HGMD':
+            if 'id' in database and database['id'] == 'HGMD':   # if the HGMD DB is present
                 print("Split HGMD columns...")
                 df = pd.read_csv(file, sep="\t")              
                 nameColumb = 'HGMD.hg38_multianno.txt'
@@ -75,7 +70,7 @@ def mergeColumns(path):
                 hgmd_split = df[nameColumb].str.split(";", expand=True)
                 
                 for index, row in hgmd_split.iterrows():
-                    for value in row.dropna():  # Usa dropna per ignorare i valori NaN
+                    for value in row.dropna():  # dropna() to ignore NaN values
                         if(value != '.' and value is not None) :
                             hgmdColSplit = value.split("=")[0]
                             df.loc[index, hgmdColSplit] = value.split("=")[1]
@@ -93,7 +88,7 @@ def mergeColumns(path):
                 gnomAD_split = df[nameColumb].str.split(";", expand=True)
                 
                 for index, row in gnomAD_split.iterrows():
-                    for value in row.dropna():  # Usa dropna per ignorare i valori NaN
+                    for value in row.dropna():  # use dropna() to ignore NaN values
                         if(value != '.' and value is not None) :
                             gnomADColSplit = value.split("=")[0]
                             if gnomADColSplit in gnomADColumns:

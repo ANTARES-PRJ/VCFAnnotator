@@ -96,8 +96,8 @@ def prepareOMIM():
 
 
 def prepare():
-    #prepareHGMD()
-    #prepareClinvar()
+    prepareHGMD()
+    prepareClinvar()
     prepareOMIM()
     
     

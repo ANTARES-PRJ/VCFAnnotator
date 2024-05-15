@@ -98,7 +98,6 @@ def mergeColumns(path):
                 df.to_csv(file, sep='\t',index=False)
     print("Merging and Splitting columns complete!")
 
-
     
 def scrapeGencode(scraping):
     url = 'https://www.gencodegenes.org/human/releases.html'
@@ -306,5 +305,3 @@ elif args.prepare:
     prepare.prepare()
 else:
     parser.error("Error: Invalid command line input. Please check your syntax or path and try again.")
-
-

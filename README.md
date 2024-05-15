@@ -50,7 +50,9 @@ Example: `file = "clinvar"` will refer to hg38_clinvar.txt.
 - **databasesVCF** and **databasesGFF3**: Specify the full file name with the Human genome reference (hg38_, ...) and the extension.
 Example: `file: "hg38_gnomad.vcf"` or `file: "hg38_hgmd.gff3"`.
 
-In the last section of the configuration file config.yaml, there is a **scraping section** where the user must insert, and constantly update, the latest version of the DBs in order to always be notified in case there are new updates on the sites.
+In the **Prepare DB** section, you need to indicate the paths of the databases to be modified with the `--prepare` command to remove the DEL, convert from .vcf to .txt, and clean the databases from comments (#).
+
+In the last section of the configuration file config.yaml, there is a **Scraping section** where the user must insert, and constantly update, the latest version of the DBs in order to always be notified in case there are new updates on the sites.
 
 For each DB, you need to insert in the changes of the scraping list: `release`, `date` or `genVersion` as indicated in the file. In this way, all the necessary variables are provided to perform a DB update check.
 
@@ -129,12 +131,19 @@ Here's a step-by-step explanation of the code:
 
 5. **Merge:** When the annotation files for each DB are created, copies are also created in `result/temp/`, where the files with .txt extension will be read to extract the column of interest, the annotation column, and they will all be concatenated at the end in a final merge .txt file. In the end, the temporary folder is deleted.
 
-6. **Separe Columns:** If the HGMD id is present in the config.yaml file then it means that there will be a column in the file obtained from the merge of DBs (previous step), new columns will be created, initially filled with the None “.” character, then by cycling all rows in the column `HGMD.hg38_multiyear.txt` the correct values in the respective row/column will be substituted by performing a stand for “;” and “=”.
+6. **Split Columns:** If the HGMD id is present in the config.yaml file then it means that there will be a column in the file obtained from the merge of DBs (previous step), new columns will be created, initially filled with the None “.” character, then by cycling all rows in the column `HGMD.hg38_multiyear.txt` the correct values in the respective row/column will be substituted by performing a stand for “;” and “=”.
 The new columns are as follows:
 `['CLASS', 'MUT', 'GENE', 'STRAND', 'DNA', 'PROT', 'DB', 'PHEN', 'RANKSCORE', 'SVTYPE', 'END', 'SVLEN']`
-are taken from the 2024/01 HGMD DB, if there are more columns in the new DBs just add them to this list called `newColumb` in the `annorar_tool.py` file.
+are taken from the 2024/01 HGMD DB, if there are more columns in the new DBs just add them to this list called `HGMDColumns` in the `annorar_tool.py` file.
+    The same thing is done for the GnomAD DB, of which only the columns `['AC', 'AN', 'AF']` will be kept. These columns are stored in a variable `gnomADColumns`. If necessary, you can increase the number of columns by adding the name of the columns to be kept in the `gnomADColumns` variable.
 
-7. **Prepare:** A database preparation procedure is executed with the  `--prepare ` command. This will perform two main functions: convert the Clinvar DB from .VCF to .TXT, thus bypassing some reading errors by Annovar, and the automatic replacement of the error string "" with "." in the ALT column of the HGMD DB, this because Annovar recognizes the character "." as a missing value and not other characters. The paths of the two original DBs must be reported in the appropriate section of config.yaml. The result of the conversion will be saved in  `db_path `.
+7. **Prepare:** A database preparation procedure is executed with the  `--prepare` command. This will perform thee main functions:
+    
+    Convert the Clinvar DB from .VCF to .TXT, thus bypassing some reading errors by Annovar;
+    
+    Automatic replacement of the error string "" with "." in the ALT column of the HGMD DB, this because Annovar recognizes the character "." as a missing value and not other characters;
+    
+    Another operation is remove comments, *e.g. #version 4.1 ...*, in the .txt format DB file, Omim and Clinvar, leaving only the header line starting with #. The paths of these original DBs must be reported in the appropriate section of config.yaml. The result of the conversion will be saved in  `db_path`.
 
 
 

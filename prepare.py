@@ -87,7 +87,8 @@ def prepareOMIM():
             with open(f"{conf['db_path']}{name}.txt", 'w', encoding='utf-8') as output_file:
                 for line in file:
                     if line.startswith('#'):
-                        if line.startswith(('# Chromosome\t', '#Chr\t', '#CHROM\t')):
+                        # identify the header string if it starts with one of the following strings
+                        if line.startswith(('# Chromosome\t', '#Chromosome\t', '# Chr\t', '#Chr\t', '# CHROM\t', '#CHROM\t')):
                             output_file.write(line)
                         continue
                     output_file.write(line)

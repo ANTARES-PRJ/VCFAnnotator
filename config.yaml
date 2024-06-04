@@ -19,7 +19,7 @@ databasesTXT:
     operation: "f"
 databasesVCF: # ;
   - id: gnomAD  #this ID must be unchanged
-    file: "hg38_gnomadExomesY.vcf"
+    file: "hg38_gnomad.vcf"
     operation: "f"
   - id: HGMD      #this ID must be unchanged
     file: "hg38_hgmd.vcf"

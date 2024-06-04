@@ -28,7 +28,7 @@ def parse_detailed_vcf_line(line):
 
 conf = load_config()
 
-def prepareHGMD():
+def prepareDEL():
     for p in conf['removeDEL']:
     #duplicate a file
         name = p['path'].split('/')[-1].split('.')[0]
@@ -72,7 +72,7 @@ def prepareClinvar():
     detailed_annovar_df.to_csv(output_file_path_detailed, sep='\t', index=False, header=True)
     print("Prepare Clinvar - Format converted from vcf to txt!")
     
-def prepareOMIM():
+def prepareTxt():
     # Remove All # comment exclude the "#Chr ..." line
     for p in conf['clean']:
         #duplicate a file
@@ -97,6 +97,6 @@ def prepareOMIM():
 
 
 def prepare():
-    prepareHGMD()
+    prepareDEL()
     prepareClinvar()
-    prepareOMIM()
+    prepareTxt()

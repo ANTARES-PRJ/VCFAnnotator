@@ -30,13 +30,13 @@ databasesGFF3: # ,
     operation: "r"
 
 #Prepare DB
-removeDEL:
-  - id: HGMD # substitute <del> with the .
+removeDEL: # substitute <del> with the .
+  - id: HGMD 
     path: "humandb/hg38_HGMD.vcf"
 
 pathClinvar: "humandb/hg38_clinvar.vcf" #convert from .vcf to .txt
 
-clean:  #remove the #comment from the file
+clean:  #remove the #comment from the file in .txt
   - id: OMIM
     path: "humandb/hg38_omim.txt"
 

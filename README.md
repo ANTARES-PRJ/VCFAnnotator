@@ -108,7 +108,7 @@ In addition, for each annotation, a unique .txt file is also generated for all t
 
 It will gather all the annotations into a single file, adding a column for each DB, called as the same, to differentiate the various annotations.
 
-For the clinvar and hgmd annotations, we have made sure to **divide** the annotation into **different columns**
+For the Clinvar hgmd, GenomAD and Omim annotations, we have made sure to **divide** the annotation into **different columns**
 
 
 ## Step-by-Step Explanation of the Code

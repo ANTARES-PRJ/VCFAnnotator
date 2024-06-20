@@ -217,13 +217,12 @@ destination_path = conf["destination_path"]
 scraping = conf["scraping"]
 parser = argparse.ArgumentParser(description="Tool per l'annotazione di file VCF")
 annotateVCF_group = parser.add_argument_group('option for --annotateVCF')
-parser.add_argument("--annotateVCF", "-a",help="Annotate VCF file with VEP", action="store", metavar="PATH")
+parser.add_argument("--annotateVCF", "-a",help="Annotate VCF file", action="store", metavar="PATH")
 annotateVCF_group.add_argument("--DBPath", "-db", help="Database path for ANNOVAR", metavar="PATH DB", required=False)
 annotateVCF_group.add_argument("--DestinationPath", "-d", help="Destination path for annotated files", metavar="PATH DEST", required=False)
 
 parser.add_argument("--checkDB", "-c",help="Check if DB was updated", action="store_true")
 parser.add_argument("--prepare", "-p",help="Prepare Databases", action="store_true")
-
 
 args = parser.parse_args()
 

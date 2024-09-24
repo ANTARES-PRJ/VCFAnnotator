@@ -94,7 +94,7 @@ def prepare_convert_to_txt():
         db = [x for x in conf['databasesTXT'] + conf['databasesVCF'] + conf['databasesGFF3'] if x['id'] == p['id']]
         # Duplicate the file in the temp folder
         db_filename = db[0]['file']
-        db_filename = [file for file in os.listdir(conf['db_path']) if file.startswith(db_filename)][0]
+        db_filename = [file for file in os.listdir(conf['db_path']) if db_filename in file][0]
         name = Path(db_filename).stem
 
         # Build the new lines with the detailed format
@@ -146,7 +146,7 @@ def prepare_clean():
                     output_file.write(line)
             
         shutil.rmtree(dest)
-        print(f"Prepare {p['id']} - Cleane complete!")
+        print(f"Prepare {p['id']} - Cleaning complete!")
 
 
 # Load the configuration file while loading the module

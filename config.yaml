@@ -15,19 +15,19 @@ databasesTXT:
     file: "clinvar"
     operation: "f"
   - id: OMIM
-    file: "genemap2"
+    file: "hg38_genemap2"
     operation: "f"
+databasesGFF3: 
+  - id: Gencode
+    file: "gencode.v46.annotation.gff3"
+    operation: "r"
 databasesVCF:
   - id: gnomAD  
-    file: "hg38_gnomad.vcf"
+    file: "gnomad_chrY.vcf"
     operation: "f"
   - id: HGMD      
     file: "HGMD_Pro_2024.1_hg38.vcf"
     operation: "f"
-databasesGFF3: 
-  - id: Gencode
-    file: "hg38_gencode.gff3"
-    operation: "r"
 
 # Prepare DB
 removeDEL:                                                          # substitute <del> with the .

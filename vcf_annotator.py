@@ -21,6 +21,15 @@ OMIM_COLUMNS = ['MIM Number', 'Gene/Locus And Other Related Symbols', 'Gene Name
 HGMD_COLUMNS = ['CLASS', 'MUT', 'GENE', 'STRAND', 'DNA', 'PROT', 'DB', 'PHEN', 'RANKSCORE', 'SVTYPE', 'END', 'SVLEN']
 GNOMAD_COLUMNS = ['AC', 'AN', 'AF']
 
+# Name of the columns to remove
+OTHERINFO_COLUMNS = ['Otherinfo1', 'Otherinfo2', 'Otherinfo3', 'Otherinfo4', 'Otherinfo5', 'Otherinfo7', 'Otherinfo8']
+NEW_NAMES = {'Otherinfo6' : 'Id',
+             'Otherinfo9' : 'Qual',
+             'Otherinfo10' : 'Filter',
+             'Otherinfo11' : 'Info',
+             'Otherinfo12' : 'Format'}
+
+
 
 def load_config(config_path="config.yaml"):
     """
@@ -161,14 +170,14 @@ def annotate_file(path, conf):
                 if db_type == 'databasesTXT':
                     if db['file'].startswith('hg38_'):
                         db['file'] = db['file'].replace('hg38_', '')
-                    print(f"perl table_annovar.pl '{path}' {db_path} -buildver hg38 -out {fileName} -remove -protocol {db['file']} -operation {db['operation']} -nastring . -vcfinput -polish")
-                    os.system(f"perl table_annovar.pl '{path}' {db_path} -buildver hg38 -out {fileName} -remove -protocol {db['file']} -operation {db['operation']} -nastring . -vcfinput -polish")
+                    print(f"perl table_annovar.pl '{path}' {db_path} -buildver hg38 -out {fileName} -remove -protocol {db['file']} -operation {db['operation']} -nastring . -vcfinput -polish --otherinfo")
+                    os.system(f"perl table_annovar.pl '{path}' {db_path} -buildver hg38 -out {fileName} -remove -protocol {db['file']} -operation {db['operation']} -nastring . -vcfinput -polish --otherinfo")
                 elif db_type == 'databasesVCF':
-                    print(f"perl table_annovar.pl '{path}' {db_path} -buildver hg38 -argument '-infoasscore' -out {fileName} -remove -protocol vcf -vcfdbfile {db['file']} -operation {db['operation']} -nastring . -vcfinput -polish")
-                    os.system(f"perl table_annovar.pl '{path}' {db_path} -buildver hg38 -argument '-infoasscore' -out {fileName} -remove -protocol vcf -vcfdbfile {db['file']} -operation {db['operation']} -nastring . -vcfinput -polish")
+                    print(f"perl table_annovar.pl '{path}' {db_path} -buildver hg38 -argument '-infoasscore' -out {fileName} -remove -protocol vcf -vcfdbfile {db['file']} -operation {db['operation']} -nastring . -vcfinput -polish --otherinfo")
+                    os.system(f"perl table_annovar.pl '{path}' {db_path} -buildver hg38 -argument '-infoasscore' -out {fileName} -remove -protocol vcf -vcfdbfile {db['file']} -operation {db['operation']} -nastring . -vcfinput -polish --otherinfo")
                 elif db_type == 'databasesGFF3':
-                    print(f"perl table_annovar.pl '{path}' {db_path} -buildver hg38 -out {fileName} -remove -gff3dbfile {db['file']} -protocol gff3 -operation {db['operation']} -nastring . -vcfinput -polish")
-                    os.system(f"perl table_annovar.pl '{path}' {db_path} -buildver hg38 -out {fileName} -remove -gff3dbfile {db['file']} -protocol gff3 -operation {db['operation']} -nastring . -vcfinput -polish")
+                    print(f"perl table_annovar.pl '{path}' {db_path} -buildver hg38 -out {fileName} -remove -gff3dbfile {db['file']} -protocol gff3 -operation {db['operation']} -nastring . -vcfinput -polish --otherinfo")
+                    os.system(f"perl table_annovar.pl '{path}' {db_path} -buildver hg38 -out {fileName} -remove -gff3dbfile {db['file']} -protocol gff3 -operation {db['operation']} -nastring . -vcfinput -polish --otherinfo")
                 else:
                     print("Error: Invalid database type")
                     
@@ -216,8 +225,14 @@ def merge_columns(path, destination_path, conf):
 
     nameFile, _ = os.path.splitext(os.path.basename(path))
     file = destination_path + nameFile + '_result_' + datetime.now().strftime('%Y-%m-%d_%H_%M_%S') + '.txt'
-    # Remove from combined_data columns with name starting with Otherinfo
-    combined_data = combined_data[combined_data.columns.drop(list(combined_data.filter(regex='Otherinfo')))]
+    
+    
+    # Remove from combined_data columns with name in OTHERINFO_COLUMNS
+    for name in OTHERINFO_COLUMNS:
+        if name in combined_data.columns:
+            combined_data.drop(columns=[name], inplace=True)
+    # Rename columns with NEW_NAMES
+    combined_data.rename(columns=NEW_NAMES, inplace=True)
     combined_data.to_csv(file, sep='\t', index=False)
     shutil.rmtree(dest)
     return file

@@ -226,13 +226,25 @@ def merge_columns(path, destination_path, conf):
     nameFile, _ = os.path.splitext(os.path.basename(path))
     file = destination_path + nameFile + '_result_' + datetime.now().strftime('%Y-%m-%d_%H_%M_%S') + '.txt'
     
-    
     # Remove from combined_data columns with name in OTHERINFO_COLUMNS
     for name in OTHERINFO_COLUMNS:
         if name in combined_data.columns:
             combined_data.drop(columns=[name], inplace=True)
     # Rename columns with NEW_NAMES
     combined_data.rename(columns=NEW_NAMES, inplace=True)
+    # Read the file in path and extract the line starting with #CHROM
+    f = open(path, 'r')
+    lines = f.readlines()
+    f.close()
+    # Save the line starting with #CHROM in a list
+    header = [line for line in lines if line.startswith("#CHROM")][0]
+    # Save the name of the columns in a list. Extract all names after FORMAT
+    columns = header.split('\t')
+    index = columns.index('FORMAT')
+    columns = columns[index+1:]
+    # Rename all columns with name being Otherinfo13, Otherinfo14, etc to those in columns
+    for i, column in enumerate(columns):
+        combined_data.rename(columns={f'Otherinfo{i+13}': column.strip()}, inplace=True)
     combined_data.to_csv(file, sep='\t', index=False)
     shutil.rmtree(dest)
     return file

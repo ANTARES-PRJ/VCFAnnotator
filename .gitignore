@@ -127,6 +127,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+humandb/
 
 # Spyder project settings
 .spyderproject
@@ -158,3 +159,11 @@ cython_debug/
 #  and can be added to the global gitignore or merged into this file.  For a more nuclear
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
+variants_reduction.pl
+table_annovar.pl
+retrieve_seq_from_fasta.pl
+/example
+annotate_variation.pl
+coding_change.pl
+convert2annovar.pl
+.DS_Store

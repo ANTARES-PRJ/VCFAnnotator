@@ -163,7 +163,6 @@ variants_reduction.pl
 table_annovar.pl
 retrieve_seq_from_fasta.pl
 /example
-annotate_variation.pl
 coding_change.pl
 convert2annovar.pl
 .DS_Store

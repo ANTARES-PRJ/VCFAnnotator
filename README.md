@@ -1,35 +1,26 @@
-# Annovar-Tool
+# VCFAnnotator
 
-We have developed a tool for the Annovar software, which enables batch processing of VCF files for DNA genome annotation, comparing various databases and scientific notations.
-This tool has the ability to annotate an entire folder of VCF files in a single command and can convert and adapt databases to be compatible with ANNOVAR.
+VCFAnnotator is a wrapper tool for the ANNOVAR software, which enables batch processing of VCF files for DNA genome annotation, comparing various biomedical databases containing scientific notations.
+This tool can annotate an entire folder of VCF files in a single command and can convert and adapt databases to be compatible with ANNOVAR.
+Additionally, it can check for database updates by scraping their own websites.
 
-Using the following databases: GnomAD, ClinVar, GENCODE, HGMD, OMIM.
+The tool has been tested by using the following databases: GnomAD, ClinVar, GENCODE, HGMD, OMIM.
 
-Our tool automatically implements a merge of the output files, so that all the annotations performed for each DB, even in different formats (.txt, .vcf, .gff3), are available in a single file. This is not possible with the stock ANNOVAR software.
-
-Please note that the tool can only annotate VCF files.
-
-Also, checking for more recent versions of the databases used, performing scraping directly on the download sites of the databases.
-- **Gencode** (https://www.gencodegenes.org/human/)
-- **Clinvar** (https://www.ncbi.nlm.nih.gov/clinvar/)
-- **GnomAD** (https://gnomad.broadinstitute.org/)
-- **OMIM** (https://www.omim.org/downloads)
-
+Our tool automatically implements a merge of the output files, so that all the annotations performed for each DB, even in different formats (.txt, .vcf, .gff3), are available in a single file. This is not possible with the stock ANNOVAR software, where each format will lead to a single file.
 
 ## Prerequisites
 
 - Python
 - Perl
-- ANNOVAR (https://annovar.openbioinformatics.org/en/latest/user-guide/download/)
-
+- ANNOVAR (https://annovar.openbioinformatics.org/en/latest/user-guide/download/). We provide a modified version of some ANNOVAR files, to solve some of its limitations.
 
 ## Installation
 
 To install the tool, simply clone the repository and install the required dependencies:
 
 ```
-git clone https://github.com/ANTARES-PRJ/AnnotazioneVCF.git
-cd annovar_tool
+git clone https://github.com/ANTARES-PRJ/VCFAnnotator.git
+cd VCFAnnotator
 ```
 
 
@@ -42,9 +33,10 @@ In the following section, databases needed for annotation should be inserted int
 There are two fields to fill in for each database:
 - `id` to differentiate it from others;
 - `file` is the name of the database file;
-- `operation` indicate the type of operation with which you want to use the specific database.
+- `operation` indicates the type of operation with which you want to use the specific database (*the following values can be used as operation:
+g means gene-based, gx means gene-based with cross-reference annotation, r means region-based and f means filter-based*)
 
-Here's how to specify the value of file for each type:
+Here's how to specify the value of the file for each type:
 - **databasesTXT**: Write the file name without extension and the Human genome reference hg38.
 Example: `file = "clinvar"` will refer to hg38_clinvar.txt.
 - **databasesVCF** and **databasesGFF3**: Specify the full file name with the Human genome reference (hg38_, ...) and the extension.
